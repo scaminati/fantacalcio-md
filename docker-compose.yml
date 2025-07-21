@@ -1,0 +1,27 @@
+services:
+
+  db:
+    container_name: fanta-db
+    image: postgres:alpine
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fantamd
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./fantamd-db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  pgadmin:
+    container_name: fanta-pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "9000:80"
+    depends_on:
+      - db
+
