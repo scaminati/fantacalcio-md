@@ -1,5 +1,17 @@
 services:
 
+  be: 
+    container_name: fanta-be
+    build:
+      context: ./fantamd-be
+      dockerfile: Dockerfile
+    env_file:
+      - ./fantamd-be/.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
   db:
     container_name: fanta-db
     image: postgres:alpine

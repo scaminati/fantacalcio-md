@@ -3,7 +3,6 @@ import env from '@fastify/env'
 declare module 'fastify' {
   export interface FastifyInstance {
     config: {
-      PORT: number;
       DB_HOST: string;
       DB_PORT: string;
       DB_USER: string;
