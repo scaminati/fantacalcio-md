@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS competitors (
+    id SERIAL PRIMARY KEY,
+    fullname VARCHAR(50) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    paid TEXT,
+    added_into_app BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    password TEXT NOT NULL
+);
