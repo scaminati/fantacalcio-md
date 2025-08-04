@@ -13,3 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) NOT NULL,
     password TEXT NOT NULL
 );
+
+INSERT INTO users (username, password)
+VALUES ('admin', '70d7fa0d132819c0aa92471d1c046e33.d8f65be829bb262cfe33bc9648795437e513afff2bf37510352d822fbfce7ca8');
+
