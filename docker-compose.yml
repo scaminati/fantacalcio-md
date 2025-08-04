@@ -6,7 +6,7 @@ services:
       context: ./fantamd-be
       dockerfile: Dockerfile
     env_file:
-      - ./fantamd-be/.env
+      - ./fantamd-be/.env.dev
     ports:
       - "8080:8080"
     depends_on:
