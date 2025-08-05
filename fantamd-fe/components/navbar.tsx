@@ -1,21 +1,17 @@
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
   NavbarBrand,
   NavbarItem,
-  NavbarMenuItem,
 } from "@heroui/navbar";
-import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
-import clsx from "clsx";
 import { ThemeSwitch } from "@/components/theme-switch";
-import Link from "next/link";
 import { Button } from "@heroui/button";
 import { HomeIcon } from "@heroicons/react/24/outline";
+import { isAuthenticated } from "@/lib/session";
 
-export const Navbar = () => {
+export const Navbar = async () => {
+  const isAuth = await isAuthenticated();
 
   return (
     <HeroUINavbar disableAnimation isBordered>
@@ -24,11 +20,13 @@ export const Navbar = () => {
         <NavbarBrand>
           <p className="font-bold text-inherit">FANTAMD</p>
         </NavbarBrand>
-        <NavbarItem>
-            <NextLink color="foreground" href="/">
-              <HomeIcon className="size-6" />
-            </NextLink>
-        </NavbarItem>
+        {isAuth && 
+          <NavbarItem>
+              <NextLink color="foreground" href="/">
+                <HomeIcon className="size-6" />
+              </NextLink>
+          </NavbarItem>
+        }
             
       </NavbarContent>
 
@@ -36,9 +34,11 @@ export const Navbar = () => {
         <NavbarItem>
           <ThemeSwitch />
         </NavbarItem>
-        <NavbarItem>
-          <Button color="warning" href="#" variant="flat">LOGOUT</Button>
-        </NavbarItem>
+        {isAuth && 
+          <NavbarItem>
+            <Button color="warning" href="#" variant="flat">LOGOUT</Button>
+          </NavbarItem>
+        } 
       </NavbarContent>
 
     </HeroUINavbar>

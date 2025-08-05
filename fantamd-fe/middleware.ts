@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { UserSession } from "./lib/session";
+import { isAuthenticated } from "./lib/session";
 
 // 1. Specify protected and public routes
 const protectedRoutes = ['/']
@@ -12,23 +12,28 @@ export default async function middleware(req: NextRequest) {
     const isProtectedRoute = protectedRoutes.includes(path)
     const isPublicRoute = publicRoutes.includes(path)
 
-    // 3. Get user session
-    const isAuthenticated = UserSession.isAuthenticated();
- 
+    // 3. Get is authenticated 
+    const isAuth = await isAuthenticated();
+    
     // 4. Redirect to /login if the user is not authenticated
-    if (isProtectedRoute && !isAuthenticated) {
+    if (isProtectedRoute && !isAuth) {
         return NextResponse.redirect(new URL('/login', req.nextUrl))
     }
-    
+
     // 5. Redirect to / if the user is authenticated
     if (
         isPublicRoute &&
-        isAuthenticated &&
-        !req.nextUrl.pathname.startsWith('/')
+        isAuth &&
+        req.nextUrl.pathname.startsWith('/login')
     ) {
         return NextResponse.redirect(new URL('/', req.nextUrl))
     }
 
 
     return NextResponse.next();
+}
+
+// Routes Middleware should not run on
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
 }

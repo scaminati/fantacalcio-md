@@ -1,9 +1,5 @@
-import { title } from "@/components/primitives";
+import LoginForm from "./compontents/LoginForm";
 
 export default function LoginPage() {
-  return (
-    <div>
-      <h1 className={title()}>Login</h1>
-    </div>
-  );
+  return <LoginForm />
 }

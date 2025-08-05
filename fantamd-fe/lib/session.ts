@@ -1,57 +1,44 @@
-"use client";
-
-const TOKEN_KEY = 'jwt_token';
-
-interface JwtPayload {
-  exp?: number;
-  [key: string]: any;
+import 'server-only'
+import { cookies } from 'next/headers'
+ 
+export async function createSession(session: string) {
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  const cookieStore = await cookies()
+ 
+  cookieStore.set('session', session, {
+    httpOnly: true,
+    secure: true,
+    expires: expiresAt,
+    sameSite: 'lax',
+    path: '/',
+  })
 }
-
-export function saveToken(token: string): void {
-  localStorage.setItem(TOKEN_KEY, token);
-}
-
-export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
-}
-
-export function deleteToken(): void {
-  localStorage.removeItem(TOKEN_KEY);
-}
-
-export function decodeToken(token: string): JwtPayload | null {
-  try {
-    const payload = token.split('.')[1];
-    const decoded = atob(payload);
-    return JSON.parse(decoded);
-  } catch (error) {
-    console.error('Invalid token format', error);
-    return null;
+ 
+export async function updateSession() {
+  const session = (await cookies()).get('session')?.value
+ 
+  if (!session) {
+    return null
   }
+ 
+  const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+ 
+  const cookieStore = await cookies()
+  cookieStore.set('session', session, {
+    httpOnly: true,
+    secure: true,
+    expires: expires,
+    sameSite: 'lax',
+    path: '/',
+  })
+}
+ 
+export async function deleteSession() {
+  const cookieStore = await cookies()
+  cookieStore.delete('session')
 }
 
-export function isTokenExpired(token: string): boolean {
-  const decoded = decodeToken(token);
-  if (!decoded || typeof decoded.exp !== 'number') return true;
-
-  const expiry = decoded.exp * 1000;
-  return Date.now() > expiry;
-}
-
-export function isTokenValid(): boolean {
-  const token = getToken();
-  if (!token) return false;
-
-  return !isTokenExpired(token);
-}
-
-export function isAuthenticated(): boolean {
-  return isTokenValid();
-}
-
-export function getUserInfo(): JwtPayload | null {
-  const token = getToken();
-  if (!token) return null;
-
-  return decodeToken(token);
+export async function isAuthenticated() {
+  const cookieStore = await cookies()
+  return cookieStore.get('session')?.value != null;
 }
