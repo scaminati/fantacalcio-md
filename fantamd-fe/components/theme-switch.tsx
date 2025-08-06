@@ -6,7 +6,6 @@ import { SwitchProps, useSwitch } from "@heroui/switch";
 import { useTheme } from "next-themes";
 import { useIsSSR } from "@react-aria/ssr";
 import clsx from "clsx";
-
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 
 export interface ThemeSwitchProps {
