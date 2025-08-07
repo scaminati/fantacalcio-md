@@ -21,11 +21,11 @@ function createCompetitorsRepository (fastify: FastifyInstance) {
         .select('*')
         .select(fastify.knex.raw('count(*) OVER() as total'))
 
-      /*
-      if (q.status !== undefined) {
-        query.where({ status: q.status })
+      if (q.search) {
+        query.whereILike('fullname', `%${q.search}%`)
+          .orWhereILike('phone', `%${q.search}%`)
+          .orWhereILike('email', `%${q.search}%`)
       }
-    */
 
       const competitors = await query
         .limit(q.limit)
@@ -43,7 +43,7 @@ function createCompetitorsRepository (fastify: FastifyInstance) {
     },
 
     async create (newCompetitor: SaveCompetitor, trx?: Knex) {
-      const [{id}] = await (trx ?? knex)<Competitor>('competitors').insert(newCompetitor).returning('id')
+      const [{ id }] = await (trx ?? knex)<Competitor>('competitors').insert(newCompetitor).returning('id')
       return id
     },
 
