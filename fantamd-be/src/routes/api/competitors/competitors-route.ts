@@ -15,10 +15,10 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         response: {
           200: ComeptitorsPageSchema
         },
-        security: [{bearerAuth: []}],
+        security: [{ bearerAuth: [] }],
         tags: ['Competitors']
       },
-      preHandler: fastify.auth([fastify.verifyAccess]),
+      preHandler: fastify.auth([fastify.verifyAccess])
 
     },
     async function (request) {
@@ -37,7 +37,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
           200: CompetitorSchema,
           404: Type.Object({ message: Type.String() })
         },
-        security: [{bearerAuth: []}],
+        security: [{ bearerAuth: [] }],
         tags: ['Competitors']
       },
       preHandler: fastify.auth([fastify.verifyAccess])
@@ -60,11 +60,9 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       schema: {
         body: SaveCompetitorsSchema,
         response: {
-          201: {
-            id: CompetitorSchema
-          }
+          201: CompetitorSchema
         },
-        security: [{bearerAuth: []}],
+        security: [{ bearerAuth: [] }],
         tags: ['Competitors']
       },
       preHandler: fastify.auth([fastify.verifyAccess])
@@ -88,7 +86,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
           200: CompetitorSchema,
           404: Type.Object({ message: Type.String() })
         },
-        security: [{bearerAuth: []}],
+        security: [{ bearerAuth: [] }],
         tags: ['Competitors']
       },
       preHandler: fastify.auth([fastify.verifyAccess])
@@ -116,7 +114,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
           204: Type.Null(),
           404: Type.Object({ message: Type.String() })
         },
-        security: [{bearerAuth: []}],
+        security: [{ bearerAuth: [] }],
         tags: ['Competitors']
       },
       preHandler: fastify.auth([fastify.verifyAccess])
