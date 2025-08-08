@@ -3,9 +3,10 @@
 import { redirect } from "next/navigation";
 
 import { createSession, deleteSession } from "@/lib/session";
+import envConfig from "@/config/envConfig";
 
 export async function login(username: string, password: string) {
-  const res = await fetch("http://localhost:8080/api/auth/login", {
+  const res = await fetch(`${envConfig.BE_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
