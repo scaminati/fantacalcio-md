@@ -1,7 +1,22 @@
 services:
 
+  fe:
+    container_name: fantamd-fe
+    build:
+      context: ./fantamd-fe
+      dockerfile: Dockerfile
+
+    env_file:
+      - ./fantamd-fe/.env.dev
+    volumes:
+      - ./next-app/src:/app/src
+      - ./next-app/public:/app/public
+    restart: always
+    ports:
+      - 3000:3000
+
   be: 
-    container_name: fanta-be
+    container_name: fantamd-be
     build:
       context: ./fantamd-be
       dockerfile: Dockerfile
@@ -13,7 +28,7 @@ services:
       - db
 
   db:
-    container_name: fanta-db
+    container_name: fantamd-db
     image: postgres:alpine
     restart: always
     shm_size: 128mb
@@ -27,7 +42,7 @@ services:
       - ./fantamd-db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   pgadmin:
-    container_name: fanta-pgadmin
+    container_name: fantamd-pgadmin
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@example.com
@@ -36,4 +51,3 @@ services:
       - "9000:80"
     depends_on:
       - db
-
