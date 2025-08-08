@@ -48,7 +48,7 @@ const colors = [
 ] as const;
 
 export default function CompetitorsTable() {
-  const limit = 10;
+  const limit = 15;
   const [page, setPage] = React.useState(1);
   const [competitors, setCompetitors] = React.useState<Competitor[]>([]);
   const [modalCompetitor, setModalCompetitor] = React.useState<Competitor>();
@@ -162,41 +162,43 @@ export default function CompetitorsTable() {
   return (
     <>
       <div className="flex flex-col h-full">
-        <CompetitorsHeader
-          applyFilterChange={setFilterValue}
-          setModalCompetitor={setModalCompetitor}
-        />
         <div className="flex-grow overflow-y-auto">
-          <Table>
-            <TableHeader columns={columns}>
-              {(column) => (
-                <TableColumn
-                  key={column.uid}
-                  align={column.uid === "actions" ? "center" : "start"}
-                >
-                  {column.name}
-                </TableColumn>
-              )}
-            </TableHeader>
-            <TableBody
-              emptyContent={"Nessun partecipante trovato"}
-              items={competitors}
-              loadingContent={<Spinner />}
-              loadingState={loadingState}
-            >
-              {(item: Competitor) => (
-                <TableRow key={item?.id}>
-                  {(columnKey) => (
-                    <TableCell>{renderCell(item, columnKey)}</TableCell>
-                  )}
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+          <div className="container mx-auto my-4 max-w-7xl">
+            <CompetitorsHeader
+              applyFilterChange={setFilterValue}
+              setModalCompetitor={setModalCompetitor}
+            />
+            <Table>
+              <TableHeader columns={columns}>
+                {(column) => (
+                  <TableColumn
+                    key={column.uid}
+                    align={column.uid === "actions" ? "center" : "start"}
+                  >
+                    {column.name}
+                  </TableColumn>
+                )}
+              </TableHeader>
+              <TableBody
+                emptyContent={"Nessun partecipante trovato"}
+                items={competitors}
+                loadingContent={<Spinner />}
+                loadingState={loadingState}
+              >
+                {(item: Competitor) => (
+                  <TableRow key={item?.id}>
+                    {(columnKey) => (
+                      <TableCell>{renderCell(item, columnKey)}</TableCell>
+                    )}
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
 
         {totalPages > 0 ? (
-          <div className="flex w-full justify-center mb-4">
+          <div className="flex w-full justify-center py-3 border-t border-divider">
             <Pagination
               isCompact
               showControls

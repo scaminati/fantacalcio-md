@@ -22,7 +22,7 @@ export default function CompetitorsHeader({
   }, []);
 
   return (
-    <div className="flex justify-between gap-3 items-end p-4 pb-0">
+    <div className="flex justify-between gap-3 items-end pb-4">
       <div className="flex gap-2 w-full sm:max-w-[40%]">
         <Button
           isIconOnly
