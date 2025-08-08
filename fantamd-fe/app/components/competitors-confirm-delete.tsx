@@ -47,12 +47,7 @@ export default function CompetitorConfirmDelete({
   }, [competitor]);
 
   return (
-    <Modal
-      isOpen={isOpen}
-      placement="top-center"
-      onClose={onCloseEvent}
-      onOpenChange={onOpenChange}
-    >
+    <Modal isOpen={isOpen} onClose={onCloseEvent} onOpenChange={onOpenChange}>
       <ModalContent>
         {(onClose) => (
           <>

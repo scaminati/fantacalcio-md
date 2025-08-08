@@ -24,7 +24,7 @@ export async function getCompetitors(
     throw new Error(respBody.message || "Errore nel recupero dei partecipanti");
   }
 
-  return await res.json();
+  return respBody;
 }
 
 export async function saveCompetitor(

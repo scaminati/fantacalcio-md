@@ -76,12 +76,7 @@ export default function CompetitorsModal({
   }, [competitor, reset, onOpen]);
 
   return (
-    <Modal
-      isOpen={isOpen}
-      placement="top-center"
-      onClose={onCloseEvent}
-      onOpenChange={onOpenChange}
-    >
+    <Modal isOpen={isOpen} onClose={onCloseEvent} onOpenChange={onOpenChange}>
       <ModalContent>
         {(onClose) => (
           <Form onSubmit={handleSubmit((data) => onSubmit(data, onClose))}>
