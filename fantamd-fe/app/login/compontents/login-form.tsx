@@ -7,6 +7,7 @@ import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { addToast } from "@heroui/toast";
 import { useRouter } from "next/navigation";
+import { Form } from "@heroui/form";
 
 import { login } from "@/app/actions/auth";
 
@@ -39,7 +40,7 @@ export default function LoginForm() {
         <h2 className="mt-6 text-center text-3xl font-bold tracking-tigh">
           Accedi
         </h2>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <Form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <Input
             required
             autoComplete="username"
@@ -71,7 +72,7 @@ export default function LoginForm() {
           >
             Accedi
           </Button>
-        </form>
+        </Form>
       </CardBody>
     </Card>
   );

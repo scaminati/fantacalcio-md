@@ -1,11 +1,11 @@
 export interface Competitor {
-  id: number;
+  id: number | undefined;
   fullname: string;
   phone: string;
   email: string;
   paid: string;
-  added_into_app: string;
-  created_at: Date;
+  added_into_app: boolean;
+  created_at: Date | undefined;
 }
 
 export interface CompetitorPage {

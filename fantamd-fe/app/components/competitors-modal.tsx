@@ -9,24 +9,71 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@heroui/modal";
+import { Form } from "@heroui/form";
+import { addToast } from "@heroui/toast";
+import { Input } from "@heroui/input";
+import {
+  DevicePhoneMobileIcon,
+  EnvelopeIcon,
+} from "@heroicons/react/24/outline";
+import { Checkbox } from "@heroui/checkbox";
+import { useForm } from "react-hook-form";
 import React from "react";
+
+import { saveCompetitor } from "../actions/competitors";
 
 import { Competitor } from "@/interfaces/competitor";
 
 export default function CompetitorsModal({
   competitor,
+  onSavedEvent,
   onCloseEvent,
 }: {
   competitor: Competitor | undefined;
+  onSavedEvent: (savedCompetitor: Competitor) => void;
   onCloseEvent: () => void;
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = useForm<Competitor>();
+
+  const onSubmit = async (data: Competitor, onClose: () => void) => {
+    try {
+      const newCompetitor = await saveCompetitor(data);
+
+      onSavedEvent(newCompetitor);
+      onClose();
+    } catch (error: any) {
+      addToast({
+        title: error.message || "Salvataggio partecipante fallito",
+        color: "danger",
+      });
+    }
+  };
+
   React.useEffect(() => {
     if (competitor) {
+      if (competitor.id) {
+        reset(competitor);
+      } else {
+        reset({
+          id: undefined,
+          fullname: "",
+          email: "",
+          phone: "",
+          paid: "",
+          added_into_app: false,
+          created_at: undefined,
+        });
+      }
       onOpen();
     }
-  }, [competitor]);
+  }, [competitor, reset, onOpen]);
 
   return (
     <Modal
@@ -37,20 +84,67 @@ export default function CompetitorsModal({
     >
       <ModalContent>
         {(onClose) => (
-          <>
-            <ModalHeader className="flex flex-col gap-1">
+          <Form onSubmit={handleSubmit((data) => onSubmit(data, onClose))}>
+            <ModalHeader className="w-full flex flex-col gap-1">
               {competitor?.id ? "Modifica" : "Aggiungi"}
             </ModalHeader>
-            <ModalBody>{competitor?.fullname}</ModalBody>
-            <ModalFooter>
+            <ModalBody className="w-full">
+              <Input
+                isRequired
+                disabled={isSubmitting}
+                label="Nome"
+                placeholder="Inserisci il nome"
+                type="text"
+                variant="bordered"
+                {...register("fullname", { required: true })}
+              />
+              <Input
+                isRequired
+                disabled={isSubmitting}
+                endContent={<EnvelopeIcon className="size-4" />}
+                label="Email"
+                placeholder="Inserisci l'email"
+                type="email"
+                variant="bordered"
+                {...register("email", { required: true })}
+              />
+              <Input
+                isRequired
+                disabled={isSubmitting}
+                endContent={<DevicePhoneMobileIcon className="size-4" />}
+                label="Telefono"
+                placeholder="Inserisci il telefono"
+                type="text"
+                variant="bordered"
+                {...register("phone", { required: true })}
+              />
+              <Input
+                isRequired
+                disabled={isSubmitting}
+                label="Pagato"
+                placeholder="Inserisci se ha pagato"
+                type="text"
+                variant="bordered"
+                {...register("paid", { required: true })}
+              />
+              <div className="flex py-2 px-1 justify-between">
+                <Checkbox
+                  disabled={isSubmitting}
+                  {...register("added_into_app")}
+                >
+                  Aggiunto in APP
+                </Checkbox>
+              </div>
+            </ModalBody>
+            <ModalFooter className="w-full">
               <Button color="danger" variant="flat" onPress={onClose}>
                 Chiudi
               </Button>
-              <Button color="primary" onPress={onClose}>
+              <Button color="primary" isLoading={isSubmitting} type="submit">
                 Salva
               </Button>
             </ModalFooter>
-          </>
+          </Form>
         )}
       </ModalContent>
     </Modal>
