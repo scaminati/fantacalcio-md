@@ -18,8 +18,10 @@ export async function getCompetitors(
     },
   );
 
+  const respBody = await res.json();
+
   if (!res.ok) {
-    throw new Error("Errore nel recupero dei partecipanti");
+    throw new Error(respBody.message || "Errore nel recupero dei partecipanti");
   }
 
   return await res.json();
@@ -42,11 +44,15 @@ export async function saveCompetitor(
     body: JSON.stringify(competitor),
   });
 
+  const respBody = await res.json();
+
   if (!res.ok) {
-    throw new Error("Errore nel salvataggio del partecipante");
+    throw new Error(
+      respBody.message || "Errore nel salvataggio del partecipante",
+    );
   }
 
-  return await res.json();
+  return respBody;
 }
 
 export async function deleteCompetitor(competitor: Competitor): Promise<void> {
@@ -62,7 +68,11 @@ export async function deleteCompetitor(competitor: Competitor): Promise<void> {
     },
   );
 
+  const respBody = await res.json();
+
   if (!res.ok) {
-    throw new Error("Errore nella cancellazione del partecipante");
+    throw new Error(
+      respBody.message || "Errore nella cancellazione del partecipante",
+    );
   }
 }

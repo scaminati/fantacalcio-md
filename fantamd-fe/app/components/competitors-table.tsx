@@ -58,10 +58,6 @@ export default function CompetitorsTable() {
   const [loadingState, setLoadingState] =
     React.useState<LoadingState>("loading");
 
-  React.useEffect(() => {
-    loadCompetitors();
-  }, [page, filterValue]);
-
   const loadCompetitors = async () => {
     setCompetitors([]);
     setLoadingState("loading");
@@ -159,13 +155,23 @@ export default function CompetitorsTable() {
     setDeleteCompetitor(undefined);
   };
 
+  React.useEffect(() => {
+    loadCompetitors();
+  }, [page, filterValue]);
+
   return (
     <>
       <div className="flex flex-col h-full">
-        <div className="flex-grow overflow-y-auto">
+        <div className="flex-grow overflow-y-auto px-4">
           <div className="container mx-auto my-4 max-w-7xl">
             <CompetitorsHeader
-              applyFilterChange={setFilterValue}
+              applyFilterChange={(newValue) => {
+                if (newValue != filterValue) {
+                  setFilterValue(newValue);
+                } else {
+                  loadCompetitors();
+                }
+              }}
               setModalCompetitor={setModalCompetitor}
             />
             <Table>
