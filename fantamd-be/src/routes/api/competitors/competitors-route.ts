@@ -61,7 +61,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         body: SaveCompetitorsSchema,
         response: {
           201: {
-            id: Type.Number()
+            id: CompetitorSchema
           }
         },
         security: [{bearerAuth: []}],
@@ -70,9 +70,9 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       preHandler: fastify.auth([fastify.verifyAccess])
     },
     async function (request, reply) {
-      const id = await competitorsRepository.create(request.body)
+      const createdCompetitor = await competitorsRepository.create(request.body)
       reply.code(201)
-      return { id }
+      return createdCompetitor
     }
   )
 

@@ -43,8 +43,8 @@ function createCompetitorsRepository (fastify: FastifyInstance) {
     },
 
     async create (newCompetitor: SaveCompetitor, trx?: Knex) {
-      const [{ id }] = await (trx ?? knex)<Competitor>('competitors').insert(newCompetitor).returning('id')
-      return id
+      const [competitor] = await (trx ?? knex)<Competitor>('competitors').insert(newCompetitor).returning('*')
+      return competitor
     },
 
     async update (id: number, changes: SaveCompetitor, trx?: Knex) {
