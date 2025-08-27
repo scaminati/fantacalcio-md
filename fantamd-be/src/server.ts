@@ -46,7 +46,7 @@ const app = Fastify({
   }
 })
 
-export function initFastify () {
+export default function initFastify () {
   // Register your application as a normal plugin.
   // fp must be used to override default error handler
   app.register(fp(serviceApp))
