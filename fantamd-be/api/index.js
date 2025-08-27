@@ -1,6 +1,8 @@
 import { initFastify } from '../src/server.js'
 
+const app = await initFastify()
+
 export default async function handler (req, res) {
-  const app = await initFastify()
+  await app.ready()
   app.server.emit('request', req, res)
 }
