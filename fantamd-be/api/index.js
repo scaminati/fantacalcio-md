@@ -1,4 +1,4 @@
-import { initFastify } from '../dist/server.js'
+import { initFastify } from './server.js'
 
 const app = initFastify()
 
