@@ -1,7 +1,6 @@
-import { initFastify, getFastify } from '../src/server.js'
+import { initFastify } from '../src/server.js'
 
 export default async function handler (req, res) {
-  await initFastify()
-  const app = getFastify()
+  const app = await initFastify()
   app.server.emit('request', req, res)
 }

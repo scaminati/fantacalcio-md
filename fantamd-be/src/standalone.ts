@@ -1,8 +1,7 @@
-import { initFastify, getFastify } from './server.js'
+import { initFastify } from './server.js'
 
 async function standalone () {
-  await initFastify()
-  const app = getFastify()
+  const app = await initFastify()
 
   try {
     // Start listening.

@@ -64,8 +64,5 @@ export async function initFastify () {
   )
 
   await app.ready()
-}
-
-export function getFastify () {
   return app
 }
