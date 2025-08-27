@@ -4,7 +4,7 @@ import fp from 'fastify-plugin'
 // Import library to exit fastify process, gracefully (if possible)
 import closeWithGrace from 'close-with-grace'
 
-// Import your application as a normal plugin.
+// Import your application as a normal plugin. 
 import serviceApp from '../app.js'
 
 /**
