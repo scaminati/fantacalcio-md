@@ -1,4 +1,5 @@
-const { initFastify } = require('../server.js')
+import { initFastify } from '../server.js'
+
 const app = initFastify()
 
 export default async function handler (req, res) {
