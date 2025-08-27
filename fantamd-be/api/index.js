@@ -1,4 +1,4 @@
-import {initFastify, getFastify} from '../src/app.js'
+import {initFastify, getFastify} from '../src/server.js'
 
 await initFastify()
 
