@@ -1,5 +1,6 @@
 import awsLambdaFastify from '@fastify/aws-lambda'
-import app from './app.js'
+import init from './server.js'
+const app = init()
 export const handler = awsLambdaFastify(app, {
   decorateRequest: false
 })
