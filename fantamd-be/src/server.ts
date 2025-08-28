@@ -36,17 +36,17 @@ function getLoggerOptions () {
   return { level: process.env.LOG_LEVEL ?? 'silent' }
 }
 
-const app = Fastify({
-  logger: getLoggerOptions(),
-  ajv: {
-    customOptions: {
-      coerceTypes: 'array', // change type of data to match type keyword
-      removeAdditional: 'all' // Remove additional body properties
+function initFastify () {
+  const app = Fastify({
+    logger: getLoggerOptions(),
+    ajv: {
+      customOptions: {
+        coerceTypes: 'array', // change type of data to match type keyword
+        removeAdditional: 'all' // Remove additional body properties
+      }
     }
-  }
-})
+  })
 
-async function init () {
   // Register your application as a normal plugin.
   // fp must be used to override default error handler
   app.register(fp(serviceApp))
@@ -63,13 +63,18 @@ async function init () {
     }
   )
 
+  return app
+}
+
+async function startServer () {
+  const app = await initFastify()
   await app.ready()
 
   try {
     // Start listening.
-    await app.listen({ 
-      host: process.env.HOST ?? "127.0.0.1",
-      port: Number(process.env.PORT ?? 8080) 
+    await app.listen({
+      host: process.env.HOST ?? '127.0.0.1',
+      port: Number(process.env.PORT ?? 8080)
     })
   } catch (err) {
     app.log.error(err)
@@ -77,4 +82,8 @@ async function init () {
   }
 }
 
-init()
+if (require.main === module) {
+  startServer()
+}
+
+export default initFastify
