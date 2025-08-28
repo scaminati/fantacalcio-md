@@ -1,6 +1,4 @@
 import awsLambdaFastify from '@fastify/aws-lambda'
-import app from './server'
-
-const proxy = awsLambdaFastify(app)
-
-export const handler = proxy
+import app from './app.js'
+export const handler = awsLambdaFastify(app)
+await app.ready() // needs to be placed after awsLambdaFastify call because of the decoration: https://github.com/fastify/aws-lambda-fastify/blob/main/index.js#L9
