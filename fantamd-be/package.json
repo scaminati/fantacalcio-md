@@ -14,7 +14,7 @@
     "standalone": "npm run build && node --env-file=.env dist/server.js",
     "lint": "eslint --ignore-pattern=dist",
     "lint:fix": "npm run lint -- --fix",
-    "build:functions": "netlify build functions --config ./webpack.config.netlify.js"
+    "build:functions": "netlify build functions"
   },
   "author": "",
   "license": "ISC",
