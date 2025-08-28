@@ -1,5 +1,5 @@
 /**
- * If you would like to turn your application into a standalone executable, look at standalone.js file
+ * If you would like to turn your application into a standalone executable, look at server.js file
  */
 
 import path from 'node:path'

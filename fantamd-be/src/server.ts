@@ -46,7 +46,7 @@ const app = Fastify({
   }
 })
 
-export function initFastify () {
+async function init () {
   // Register your application as a normal plugin.
   // fp must be used to override default error handler
   app.register(fp(serviceApp))
@@ -62,5 +62,19 @@ export function initFastify () {
       await app.close()
     }
   )
-  return app
+
+  await app.ready()
+
+  try {
+    // Start listening.
+    await app.listen({ 
+      host: process.env.HOST ?? "127.0.0.1",
+      port: Number(process.env.PORT ?? 8080) 
+    })
+  } catch (err) {
+    app.log.error(err)
+    process.exit(1)
+  }
 }
+
+init()
