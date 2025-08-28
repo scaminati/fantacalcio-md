@@ -13,8 +13,7 @@
     "test:run": "glob -c \"tsx --test\" \"./test/**/*.ts\"",
     "standalone": "npm run build && node --env-file=.env dist/server.js",
     "lint": "eslint --ignore-pattern=dist",
-    "lint:fix": "npm run lint -- --fix",
-    "build:functions": "netlify build functions"
+    "lint:fix": "npm run lint -- --fix"
   },
   "author": "",
   "license": "ISC",
@@ -48,7 +47,6 @@
     "fastify-tsconfig": "^3.0.0",
     "form-data": "^4.0.3",
     "neostandard": "^0.12.2",
-    "netlify-cli": "^23.4.2",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   }
