@@ -1,0 +1,34 @@
+import { Type } from '@fastify/type-provider-typebox';
+import { CredentialsSchema } from '../../../schemas/auth.js';
+const plugin = async (fastify) => {
+    const { usersRepository, passwordManager } = fastify;
+    fastify.post('/login', {
+        schema: {
+            body: CredentialsSchema,
+            response: {
+                200: Type.Object({
+                    token: Type.String()
+                }),
+                401: Type.Object({
+                    message: Type.String()
+                })
+            },
+            tags: ['Authentication']
+        }
+    }, async function (request, reply) {
+        const { username, password } = request.body;
+        return fastify.knex.transaction(async (trx) => {
+            const user = await usersRepository.findByUsername(username, trx);
+            if (user) {
+                const isPasswordValid = await passwordManager.compare(password, user.password);
+                if (isPasswordValid) {
+                    const { password, ...jwtUser } = user;
+                    return { token: fastify.jwt.sign({ user: jwtUser }) };
+                }
+            }
+            reply.status(401);
+            return { message: 'Invalid username or password.' };
+        });
+    });
+};
+export default plugin;
