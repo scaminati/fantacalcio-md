@@ -1,4 +1,4 @@
-import { initFastify } from './server.js'
+import { initFastify } from 'https://fantamd-be.vercel.app/server.js'
 
 const app = initFastify()
 
