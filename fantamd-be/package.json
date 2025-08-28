@@ -13,7 +13,8 @@
     "test:run": "glob -c \"tsx --test\" \"./test/**/*.ts\"",
     "standalone": "npm run build && node --env-file=.env dist/server.js",
     "lint": "eslint --ignore-pattern=dist",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "build:functions": "netlify-lambda build functions --config ./webpack.config.netlify.js"
   },
   "author": "",
   "license": "ISC",
@@ -31,7 +32,6 @@
     "@fastify/swagger": "^9.5.1",
     "@fastify/swagger-ui": "^5.2.3",
     "@fastify/type-provider-typebox": "^5.2.0",
-    "@netlify/functions": "^4.2.4",
     "@sinclair/typebox": "^0.34.37",
     "fastify": "^5.4.0",
     "fastify-cli": "^7.4.0",
