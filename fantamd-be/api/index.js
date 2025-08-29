@@ -1,4 +1,4 @@
-import serviceApp, { options } from './app.js'
+import serviceApp, { options } from '../app.js'
 import Fastify from 'fastify'
 import fp from 'fastify-plugin'
 
