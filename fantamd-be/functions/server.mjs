@@ -1,5 +1,5 @@
 import awsLambdaFastify from '@fastify/aws-lambda'
-import init from './src/server.ts'
+import init from './server.js'
 
 const app = init()
 const handlerLambda = awsLambdaFastify(app)
