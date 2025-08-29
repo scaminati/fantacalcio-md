@@ -127,7 +127,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         return reply.notFound('Competitor not found')
       }
 
-      return reply.code(204).send({ id: request.params.id })
+      return reply.code(200).send({ id: request.params.id })
     }
   )
 }
