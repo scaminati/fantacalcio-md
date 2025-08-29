@@ -1,9 +1,9 @@
 import awsLambdaFastify from '@fastify/aws-lambda'
-import serviceApp from '../dist/app.js'
-import Fastify from 'fastify'
+import serviceApp, { options } from '../dist/app.js'
+import Fastify, { FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
 
-const app = Fastify({ logger: true })
+const app: FastifyInstance = Fastify({ logger: true, ...options as any }) as any
 const handlerLambda = awsLambdaFastify(app)
 
 export const handler = async (event, context) => {
