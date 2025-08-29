@@ -81,9 +81,9 @@ async function startServer () {
     process.exit(1)
   }
 }
-/*
+
 if (require.main === module) {
   startServer()
 }
-*/
+
 export default init
