@@ -1,0 +1,10 @@
+# netlify.toml
+[functions]
+    node_bundler = "esbuild"
+    included_files = ["dist/**/*.js"]
+
+[build]
+    base = "fantamd-be"
+    command = "npm run build"
+    functions = "functions"
+    publish = "dist"
