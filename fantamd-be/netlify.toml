@@ -1,7 +1,4 @@
 # netlify.toml
-[functions]
-    included_files = ["dist/**/*.js"]
-
 [build]
     base = "fantamd-be"
     command = "npm run build"
