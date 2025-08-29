@@ -1,4 +1,11 @@
 # netlify.toml
+[functions]
+  directory = "functions"
+  node_bundler = "none"
+  included_files = [
+    "dist/**"
+  ]
+
 [build]
     base = "fantamd-be"
     command = "npm run build"
