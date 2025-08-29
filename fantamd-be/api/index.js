@@ -3,9 +3,9 @@ import Fastify from 'fastify'
 import fp from 'fastify-plugin'
 
 const app = Fastify({ logger: true, ...options })
+app.register(fp(serviceApp))
 
 export default async function handler (req, reply) {
-  app.register(fp(serviceApp))
   await app.ready()
   app.server.emit('request', req, reply)
 }
