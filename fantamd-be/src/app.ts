@@ -2,13 +2,9 @@
  * If you would like to turn your application into a standalone executable, look at server.js file
  */
 
-import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 import { fastifyAutoload } from '@fastify/autoload'
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
 
 export const options = {
   ajv: {
