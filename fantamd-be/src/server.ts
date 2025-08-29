@@ -12,7 +12,7 @@ import fp from 'fastify-plugin'
 import closeWithGrace from 'close-with-grace'
 
 // Import your application as a normal plugin.
-import serviceApp, { options } from './app.js'
+import serviceApp from './app.js'
 
 /**
  * Do not use NODE_ENV to determine what logger (or any env related feature) to use
@@ -38,7 +38,12 @@ function getLoggerOptions () {
 
 const app = Fastify({
   logger: getLoggerOptions(),
-  ...options as any
+  ajv: {
+    customOptions: {
+      coerceTypes: 'array', // change type of data to match type keyword
+      removeAdditional: 'all' // Remove additional body properties
+    }
+  }
 })
 
 async function init () {
@@ -62,9 +67,9 @@ async function init () {
 
   try {
     // Start listening.
-    await app.listen({
-      host: process.env.HOST ?? '127.0.0.1',
-      port: Number(process.env.PORT ?? 8080)
+    await app.listen({ 
+      host: process.env.HOST ?? "127.0.0.1",
+      port: Number(process.env.PORT ?? 8080) 
     })
   } catch (err) {
     app.log.error(err)
