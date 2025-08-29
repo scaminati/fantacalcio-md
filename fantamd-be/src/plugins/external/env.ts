@@ -10,6 +10,7 @@ declare module 'fastify' {
       DB_DATABASE: string;
       JWT_SECRET: string;
       RATE_LIMIT_MAX: number;
+      DB_SSL: boolean;
     };
   }
 }
@@ -42,6 +43,10 @@ const schema = {
     },
     DB_DATABASE: {
       type: 'string'
+    },
+    DB_SSL: {
+      type: 'boolean',
+      default: false
     },
 
     // Security

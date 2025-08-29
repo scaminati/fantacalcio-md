@@ -16,7 +16,8 @@ export const autoConfig = (fastify: FastifyInstance) => {
       user: fastify.config.DB_USER,
       password: fastify.config.DB_PASSWORD,
       database: fastify.config.DB_DATABASE,
-      port: Number(fastify.config.DB_PORT)
+      port: Number(fastify.config.DB_PORT),
+      ssl: fastify.config.DB_SSL ? { rejectUnauthorized: false } : false
     },
     pool: { min: 2, max: 10 }
   }
