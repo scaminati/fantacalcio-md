@@ -111,7 +111,9 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
           id: Type.Number()
         }),
         response: {
-          204: Type.Null(),
+          200: Type.Object(
+            { id: Type.Number() }
+          ),
           404: Type.Object({ message: Type.String() })
         },
         security: [{ bearerAuth: [] }],
@@ -125,7 +127,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         return reply.notFound('Competitor not found')
       }
 
-      return reply.code(204).send(null)
+      return reply.code(204).send({ id: request.params.id })
     }
   )
 }
