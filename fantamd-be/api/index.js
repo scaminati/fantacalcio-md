@@ -1,4 +1,3 @@
-import '@fastify/aws-lambda'
 import serviceApp, { options } from './app.js'
 import Fastify from 'fastify'
 import fp from 'fastify-plugin'
