@@ -47,7 +47,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       const competitor = await competitorsRepository.findById(id)
 
       if (!competitor) {
-        return reply.notFound('Competitor not found')
+        return reply.notFound('Partecipante non trovato!')
       }
 
       return competitor
@@ -96,7 +96,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       const updatedCompetitor = await competitorsRepository.update(id, request.body)
 
       if (!updatedCompetitor) {
-        return reply.notFound('Competitor not found')
+        return reply.notFound('Partecipante non trovato!')
       }
 
       return updatedCompetitor
@@ -124,7 +124,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
     async function (request, reply) {
       const deleted = await competitorsRepository.delete(request.params.id)
       if (!deleted) {
-        return reply.notFound('Competitor not found')
+        return reply.notFound('Partecipante non trovato!')
       }
 
       return reply.code(200).send({ id: request.params.id })

@@ -228,7 +228,11 @@ export default function CompetitorsTable() {
               ),
             );
           } else {
-            setPage(1);
+            if (page > 1) {
+              setPage(1);
+            } else {
+              loadCompetitors();
+            }
           }
         }}
       />

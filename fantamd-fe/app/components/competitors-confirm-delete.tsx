@@ -9,7 +9,7 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@heroui/modal";
-import React from "react";
+import React, { useState } from "react";
 import { addToast } from "@heroui/toast";
 
 import { deleteCompetitor } from "../actions/competitors";
@@ -26,13 +26,16 @@ export default function CompetitorConfirmDelete({
   onCloseEvent: () => void;
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [isSaving, setIsSaving] = useState(false);
 
   const onConfirm = async (onClose: () => void) => {
     try {
+      setIsSaving(true);
       await deleteCompetitor(competitor!);
       onDeleteEvent();
       onClose();
     } catch (error: any) {
+      setIsSaving(false);
       addToast({
         title: error.message || "Cancellazione partecipante fallita",
         color: "danger",
@@ -42,6 +45,7 @@ export default function CompetitorConfirmDelete({
 
   React.useEffect(() => {
     if (competitor) {
+      setIsSaving(false);
       onOpen();
     }
   }, [competitor]);
@@ -59,7 +63,11 @@ export default function CompetitorConfirmDelete({
               <Button color="default" variant="flat" onPress={onClose}>
                 Annulla
               </Button>
-              <Button color="danger" onPress={() => onConfirm(onClose)}>
+              <Button
+                color="danger"
+                isLoading={isSaving}
+                onPress={() => onConfirm(onClose)}
+              >
                 Conferma
               </Button>
             </ModalFooter>
