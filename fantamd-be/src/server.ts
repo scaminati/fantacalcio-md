@@ -50,6 +50,11 @@ function init () {
   // Register your application as a normal plugin.
   // fp must be used to override default error handler
   app.register(fp(serviceApp))
+  return app
+}
+
+async function startServer () {
+  const app = init()
 
   // Delay is the number of milliseconds for the graceful close to finish
   closeWithGrace(
@@ -62,11 +67,7 @@ function init () {
       await app.close()
     }
   )
-  return app
-}
 
-async function startServer () {
-  const app = init()
   await app.ready()
 
   try {
