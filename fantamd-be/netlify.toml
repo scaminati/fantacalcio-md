@@ -8,3 +8,8 @@
     command = "npm run build"
     functions = "functions"
     publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/server/:splat"
+  status = 200

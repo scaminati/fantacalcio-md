@@ -1,11 +1,11 @@
 import awsLambdaFastify from '@fastify/aws-lambda'
-import init from './dist/server'
+import init from './dist/server.js'
 
 const app = init()
 const handler = awsLambdaFastify(app)
 const appIsReady = app.ready()
 
-module.exports.handler = async (event, context) => {
+export const handlerLambda = async (event, context) => {
   await appIsReady
   return handler(event, context)
 }
