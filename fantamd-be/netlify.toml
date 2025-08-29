@@ -1,7 +1,5 @@
 # netlify.toml
 [functions]
-  directory = "functions"
-  node_bundler = "esbuild"
   included_files = [
     "dist/**"
   ]

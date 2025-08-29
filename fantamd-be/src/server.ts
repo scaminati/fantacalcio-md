@@ -36,25 +36,20 @@ function getLoggerOptions () {
   return { level: process.env.LOG_LEVEL ?? 'silent' }
 }
 
-function init () {
-  const app = Fastify({
-    logger: getLoggerOptions(),
-    ajv: {
-      customOptions: {
-        coerceTypes: 'array', // change type of data to match type keyword
-        removeAdditional: 'all' // Remove additional body properties
-      }
+const app = Fastify({
+  logger: getLoggerOptions(),
+  ajv: {
+    customOptions: {
+      coerceTypes: 'array', // change type of data to match type keyword
+      removeAdditional: 'all' // Remove additional body properties
     }
-  })
+  }
+})
 
+async function init () {
   // Register your application as a normal plugin.
   // fp must be used to override default error handler
   app.register(fp(serviceApp))
-  return app
-}
-
-async function startServer () {
-  const app = init()
 
   // Delay is the number of milliseconds for the graceful close to finish
   closeWithGrace(
@@ -82,8 +77,4 @@ async function startServer () {
   }
 }
 
-if (require.main === module) {
-  startServer()
-}
-
-export default init
+init()
