@@ -1,4 +1,4 @@
-import awsLambdaFastify from '@fastify/aws-lambda'
+import awsLambdaFastify from '../lambda/aws-lambda.js'
 import serviceApp, { options } from '../dist/app.js'
 import Fastify, { FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
