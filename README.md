@@ -1,7 +1,7 @@
 
-# 🧙‍♂️ Fantamd
+# 🧙‍♂️ FantaMD
 
-Fantamd is a full-stack web application designed for modern web experiences. It combines a **Fastify + PostgreSQL** backend with a **Next.js + Tailwind CSS + Hero UI** frontend. The entire project is deployed on **[Vercel](https://vercel.com/)** for seamless hosting and scalability.
+FantaMD is a full-stack web application designed to support participants management for our fantasy football game. It combines a **Fastify + PostgreSQL** backend with a **Next.js + Tailwind CSS + Hero UI** frontend. The entire project is deployed on **[Vercel](https://vercel.com/)** for seamless hosting and scalability.
 
 ---
 
@@ -90,5 +90,32 @@ cd fantamd-fe
 npm install
 npm run dev
 ```
+
+---
+
+## 🐳 Docker Setup
+
+You can run the entire FantaMD stack using Docker Compose. This includes:
+
+- **Frontend** (`fantamd-fe`)
+- **Backend** (`fantamd-be`)
+- **PostgreSQL Database** (`fantamd-db`)
+- **pgAdmin** (`fantamd-pgadmin`) for database management
+
+### 🚀 How to Run
+
+1. Make sure Docker and Docker Compose are installed.
+2. From the root of the project, run:
+
+```bash
+docker-compose up --build
+```
+
+3. Access the services:
+   - Frontend: [http://localhost:3000](http://localhost:3000)
+   - Backend API: [http://localhost:8080](http://localhost:8080)
+   - pgAdmin: [http://localhost:9000](http://localhost:9000)
+
+> Use `admin@example.com` / `admin` to log into pgAdmin and connect to the `fantamd` database.
 
 ---
