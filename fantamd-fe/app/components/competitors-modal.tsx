@@ -22,7 +22,7 @@ import React from "react";
 
 import { saveCompetitor } from "../actions/competitors";
 
-import { Competitor } from "@/interfaces/competitor";
+import { Competitor } from "@/interfaces/interfaces";
 
 export default function CompetitorsModal({
   competitor,
@@ -44,13 +44,20 @@ export default function CompetitorsModal({
 
   const onSubmit = async (data: Competitor, onClose: () => void) => {
     try {
-      const newCompetitor = await saveCompetitor(data);
+      const result = await saveCompetitor(data);
 
-      onSavedEvent(newCompetitor);
-      onClose();
-    } catch (error: any) {
+      if (result?.error || !result.data) {
+        addToast({
+          title: result?.error || "Salvataggio partecipante fallito",
+          color: "danger",
+        });
+      } else {
+        onSavedEvent(result.data);
+        onClose();
+      }
+    } catch (_: any) {
       addToast({
-        title: error.message || "Salvataggio partecipante fallito",
+        title: "Errore nella comunicazione",
         color: "danger",
       });
     }

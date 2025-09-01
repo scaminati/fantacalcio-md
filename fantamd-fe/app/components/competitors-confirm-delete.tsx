@@ -14,7 +14,7 @@ import { addToast } from "@heroui/toast";
 
 import { deleteCompetitor } from "../actions/competitors";
 
-import { Competitor } from "@/interfaces/competitor";
+import { Competitor } from "@/interfaces/interfaces";
 
 export default function CompetitorConfirmDelete({
   competitor,
@@ -31,13 +31,21 @@ export default function CompetitorConfirmDelete({
   const onConfirm = async (onClose: () => void) => {
     try {
       setIsSaving(true);
-      await deleteCompetitor(competitor!);
-      onDeleteEvent();
-      onClose();
-    } catch (error: any) {
+      const result = await deleteCompetitor(competitor!);
+
+      if (result?.error) {
+        addToast({
+          title: result?.error || "Cancellazione partecipante fallita",
+          color: "danger",
+        });
+      } else {
+        onDeleteEvent();
+        onClose();
+      }
+    } catch (_: any) {
       setIsSaving(false);
       addToast({
-        title: error.message || "Cancellazione partecipante fallita",
+        title: "Errore nella comunicazione",
         color: "danger",
       });
     }

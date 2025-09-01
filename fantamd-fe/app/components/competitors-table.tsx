@@ -30,7 +30,7 @@ import CompetitorsModal from "./competitors-modal";
 import CompetitorConfirmDelete from "./competitors-confirm-delete";
 
 import { getCompetitors } from "@/app/actions/competitors";
-import { Competitor } from "@/interfaces/competitor";
+import { Competitor } from "@/interfaces/interfaces";
 
 const columns = [
   { name: "NOME", uid: "fullname" },
@@ -63,13 +63,22 @@ export default function CompetitorsTable() {
     setLoadingState("loading");
 
     try {
-      const data = await getCompetitors(page, limit, filterValue);
+      const result = await getCompetitors(page, limit, filterValue);
 
-      setTotalPages(data?.total ? Math.ceil(data.total / limit) : 0);
-      setCompetitors(data?.results || []);
-    } catch (error: any) {
+      if (result?.error) {
+        addToast({
+          title: result?.error || "Errore nel recupero dei partecipanti",
+          color: "danger",
+        });
+      } else {
+        const data = result.data;
+
+        setTotalPages(data?.total ? Math.ceil(data.total / limit) : 0);
+        setCompetitors(data?.results || []);
+      }
+    } catch (_: any) {
       addToast({
-        title: error.message,
+        title: "Errore nella comunicazione",
         color: "danger",
       });
     } finally {

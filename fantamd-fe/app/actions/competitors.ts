@@ -1,14 +1,18 @@
 "use server";
 
 import envConfig from "@/config/envConfig";
-import { Competitor, CompetitorPage } from "@/interfaces/competitor";
+import {
+  ActionResponse,
+  Competitor,
+  CompetitorPage,
+} from "@/interfaces/interfaces";
 import { getToken } from "@/lib/session";
 
 export async function getCompetitors(
   page: number,
   limit: number,
   search: string,
-): Promise<CompetitorPage> {
+): Promise<ActionResponse<CompetitorPage>> {
   const token = await getToken();
   const res = await fetch(
     `${envConfig.BE_URL}/api/competitors?page=${page}&limit=${limit}&search=${search}`,
@@ -22,15 +26,19 @@ export async function getCompetitors(
   const respBody = await res.json();
 
   if (!res.ok) {
-    throw new Error(respBody.message || "Errore nel recupero dei partecipanti");
+    return {
+      error: respBody.message || "Errore nel recupero dei partecipanti",
+    };
   }
 
-  return respBody;
+  return {
+    data: respBody,
+  };
 }
 
 export async function saveCompetitor(
   competitor: Competitor,
-): Promise<Competitor> {
+): Promise<ActionResponse<Competitor>> {
   const token = await getToken();
   let competitorPath = `${envConfig.BE_URL}/api/competitors`;
 
@@ -48,15 +56,19 @@ export async function saveCompetitor(
   const respBody = await res.json();
 
   if (!res.ok) {
-    throw new Error(
-      respBody.message || "Errore nel salvataggio del partecipante",
-    );
+    return {
+      error: respBody.message || "Errore nel salvataggio del partecipante",
+    };
   }
 
-  return respBody;
+  return {
+    data: respBody,
+  };
 }
 
-export async function deleteCompetitor(competitor: Competitor): Promise<void> {
+export async function deleteCompetitor(
+  competitor: Competitor,
+): Promise<ActionResponse<void>> {
   const token = await getToken();
 
   const res = await fetch(
@@ -72,8 +84,12 @@ export async function deleteCompetitor(competitor: Competitor): Promise<void> {
   const respBody = await res.json();
 
   if (!res.ok) {
-    throw new Error(
-      respBody.message || "Errore nella cancellazione del partecipante",
-    );
+    return {
+      error: respBody.message || "Errore nella cancellazione del partecipante",
+    };
   }
+
+  return {
+    data: respBody,
+  };
 }

@@ -4,8 +4,12 @@ import { redirect } from "next/navigation";
 
 import { createSession, deleteSession } from "@/lib/session";
 import envConfig from "@/config/envConfig";
+import { ActionResponse, Auth } from "@/interfaces/interfaces";
 
-export async function login(username: string, password: string) {
+export async function login(
+  username: string,
+  password: string,
+): Promise<ActionResponse<Auth>> {
   const res = await fetch(`${envConfig.BE_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -15,10 +19,14 @@ export async function login(username: string, password: string) {
   const data = await res.json();
 
   if (!res.ok || !data.token) {
-    throw new Error(data.message || "Accesso fallito");
+    return { error: data.message };
   }
 
   await createSession(data.token);
+
+  return {
+    data: data,
+  };
 }
 
 export async function logout() {

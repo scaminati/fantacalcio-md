@@ -22,12 +22,21 @@ export default function LoginForm() {
     e.preventDefault();
 
     try {
-      await login(username, password);
-      router.push("/");
-    } catch (error: any) {
+      const result = await login(username, password);
+
+      if (result?.error) {
+        setIsLoading(false);
+        addToast({
+          title: result?.error || "Accesso fallito",
+          color: "danger",
+        });
+      } else {
+        router.push("/");
+      }
+    } catch (_: any) {
       setIsLoading(false);
       addToast({
-        title: error.message || "Accesso fallito",
+        title: "Errore nella comunicazione",
         color: "danger",
       });
     }

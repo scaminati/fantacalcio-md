@@ -1,3 +1,8 @@
+export interface ActionResponse<T> {
+  data?: T;
+  error?: string;
+}
+
 export interface Competitor {
   id: number | undefined;
   fullname: string;
@@ -11,4 +16,8 @@ export interface Competitor {
 export interface CompetitorPage {
   total: number;
   results: [Competitor];
+}
+
+export interface Auth {
+  token: string;
 }

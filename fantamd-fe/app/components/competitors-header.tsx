@@ -3,7 +3,7 @@ import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Input } from "@heroui/input";
 import React from "react";
 
-import { Competitor } from "@/interfaces/competitor";
+import { Competitor } from "@/interfaces/interfaces";
 
 export default function CompetitorsHeader({
   applyFilterChange,
