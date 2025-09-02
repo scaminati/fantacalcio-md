@@ -27,7 +27,7 @@ export const SaveCompetitorsSchema = Type.Object({
 export const QueryCompetitorsSchema = Type.Object({
   page: Type.Integer({ minimum: 1, default: 1 }),
   limit: Type.Integer({ minimum: 1, maximum: 100, default: 10 }),
-  search: Type.String(),
+  search: Type.Optional(Type.String()),
   order: Type.Optional(Type.Union([
     Type.Literal('asc'),
     Type.Literal('desc')
