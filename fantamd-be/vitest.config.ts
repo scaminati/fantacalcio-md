@@ -6,6 +6,11 @@ dotenv.config({ path: '.env.test' })
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['test/**/*.test.ts']
+    include: ['test/**/*.test.ts'],
+    coverage: {
+      include: ['src']
+    },
+    setupFiles: ['./test/test-setup.ts'],
+    globalSetup: './test/global-setup.ts'
   }
 })

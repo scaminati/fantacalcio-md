@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import fastify from '../fastify.js'
+import fastify from '../test-setup.ts'
 
 describe('GET /', () => {
   test('Should return status OK with message', async () => {

@@ -5,11 +5,11 @@ import { Auth } from '../../../schemas/auth.js'
 
 declare module 'fastify' {
   interface FastifyInstance {
-    usersRepository: ReturnType<typeof createUsersRepository>;
+    usersRepository: ReturnType<typeof usersRepository>;
   }
 }
 
-function createUsersRepository (fastify: FastifyInstance) {
+function usersRepository (fastify: FastifyInstance) {
   const knex = fastify.knex
 
   return {
@@ -26,7 +26,7 @@ function createUsersRepository (fastify: FastifyInstance) {
 
 export default fp(
   async function (fastify: FastifyInstance) {
-    const repo = createUsersRepository(fastify)
+    const repo = usersRepository(fastify)
     fastify.decorate('usersRepository', repo)
   },
   {

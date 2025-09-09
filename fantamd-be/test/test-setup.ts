@@ -9,12 +9,13 @@ function buildFastify () {
   return app
 }
 
-const fastify = buildFastify()
+const fastify: any = buildFastify()
 
 beforeAll(async () => {
   // called once before all tests run
   await fastify.ready()
 })
+
 afterAll(async () => {
   // called once after all tests run
   await fastify.close()
