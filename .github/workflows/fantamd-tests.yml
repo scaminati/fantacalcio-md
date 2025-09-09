@@ -10,8 +10,12 @@ on:
     branches: [ "main" ]
 
 jobs:
-  tests:
+  fantamd-be-tests:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./fantamd-be
         
     steps:
       - uses: actions/checkout@v5
