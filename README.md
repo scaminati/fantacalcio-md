@@ -30,7 +30,7 @@ npm run build       # Compile TypeScript
 npm start           # Start Fastify server
 npm run standalone  # Run with .env file
 npm test            # Run tests with watch mode - need docker installed
-npm run test:run            # Run tests with coverage - need docker installed
+npm run test:run    # Run tests with coverage - need docker installed
 npm run lint        # Lint code
 ```
 
