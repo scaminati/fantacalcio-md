@@ -8,7 +8,13 @@ export default defineConfig({
     environment: 'node',
     include: ['test/**/*.test.ts'],
     coverage: {
-      include: ['src']
+      include: ['src'],
+      thresholds: {
+        lines: 85,
+        functions: 85,
+        branches: 85,
+        statements: 85
+      }
     },
     setupFiles: ['./test/test-setup.ts'],
     globalSetup: './test/global-setup.ts'

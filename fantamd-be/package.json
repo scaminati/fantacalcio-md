@@ -11,6 +11,7 @@
     "build": "tsc",
     "test": "NODE_OPTIONS='--import tsx' vitest",
     "test:run": "NODE_OPTIONS='--import tsx' vitest run --coverage",
+    "test:ui": "NODE_OPTIONS='--import tsx' vitest --ui",
     "standalone": "npm run build && node --env-file=.env dist/server.js",
     "lint": "eslint --ignore-pattern=dist",
     "lint:fix": "npm run lint -- --fix"
