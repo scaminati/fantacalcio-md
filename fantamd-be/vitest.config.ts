@@ -9,6 +9,7 @@ export default defineConfig({
     include: ['test/**/*.test.ts'],
     coverage: {
       include: ['src'],
+      reporter: ['text', 'json-summary', 'json'],
       reportOnFailure: true,
       thresholds: {
         lines: 85,

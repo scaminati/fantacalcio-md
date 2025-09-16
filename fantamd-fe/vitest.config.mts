@@ -15,6 +15,7 @@ export default defineConfig({
     include: ['test/**/*.test.ts', 'test/**/*.test.tsx'],
     coverage: {
       include: ['app', 'components', 'lib'],
+      reporter: ['text', 'json-summary', 'json'],
       reportOnFailure: true,
       thresholds: {
         lines: 85,
