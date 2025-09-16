@@ -4,34 +4,19 @@ import {
   NavbarBrand,
   NavbarItem,
 } from "@heroui/navbar";
-import React from "react";
 
 import { ThemeSwitch } from "@/components/theme-switch";
 import { isAuthenticated } from "@/lib/session";
 import LogoutButton from "@/app/login/compontents/logout-button";
 
-export const Navbar = () => {
-  const [isAuth, setIsAuth] = React.useState<boolean | null>(null);
-
-  React.useEffect(() => {
-    const checkAuth = async () => {
-      const result = await isAuthenticated();
-
-      setIsAuth(result);
-    };
-
-    checkAuth();
-  }, []);
-
-  if (isAuth === null) return null;
+export const Navbar = async () => {
+  const isAuth = await isAuthenticated();
 
   return (
     <HeroUINavbar disableAnimation isBordered>
       <NavbarContent className="gap-4" justify="center">
         <NavbarBrand>
-          <p className="font-bold text-inherit" data-testid="app-name">
-            FANTAMD
-          </p>
+          <p className="font-bold text-inherit">FANTAMD</p>
         </NavbarBrand>
         {isAuth && (
           <NavbarItem>
