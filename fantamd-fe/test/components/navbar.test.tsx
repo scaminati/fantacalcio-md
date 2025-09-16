@@ -9,7 +9,7 @@ describe("Navbar component", () => {
   test("Show navbar when user is not autenticated", async () => {
     vi.mocked(isAuthenticated).mockResolvedValueOnce(false);
 
-    render(<Navbar />);
+    render(await Navbar());
 
     expect(isAuthenticated).toHaveBeenCalledOnce();
 
@@ -23,7 +23,7 @@ describe("Navbar component", () => {
   test("Show navbar when user is autenticated", async () => {
     vi.mocked(isAuthenticated).mockResolvedValueOnce(true);
 
-    render(<Navbar />);
+    render(await Navbar());
 
     expect(isAuthenticated).toHaveBeenCalledOnce();
 
@@ -37,7 +37,7 @@ describe("Navbar component", () => {
   test("Perform logout after button click", async () => {
     vi.mocked(isAuthenticated).mockResolvedValueOnce(true);
 
-    render(<Navbar />);
+    render(await Navbar());
 
     const logoutButton = await screen.findByTestId("logout-button");
 

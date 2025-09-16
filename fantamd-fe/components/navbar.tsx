@@ -16,7 +16,9 @@ export const Navbar = async () => {
     <HeroUINavbar disableAnimation isBordered>
       <NavbarContent className="gap-4" justify="center">
         <NavbarBrand>
-          <p className="font-bold text-inherit">FANTAMD</p>
+          <p className="font-bold text-inherit" data-testid="app-name">
+            FANTAMD
+          </p>
         </NavbarBrand>
         {isAuth && (
           <NavbarItem>
