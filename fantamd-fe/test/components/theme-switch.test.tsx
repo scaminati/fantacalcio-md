@@ -6,7 +6,7 @@ import { ThemeSwitch } from "@/components/theme-switch";
 
 test("ThemeSwitch component", async () => {
   render(
-    <ThemeProvider attribute="class">
+    <ThemeProvider attribute="class" defaultTheme="light">
       <ThemeSwitch />
     </ThemeProvider>,
   );

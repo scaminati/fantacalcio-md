@@ -15,6 +15,7 @@ export default defineConfig({
     include: ['test/**/*.test.ts', 'test/**/*.test.tsx'],
     coverage: {
       include: ['app', 'components', 'lib'],
+      reportOnFailure: true,
       thresholds: {
         lines: 85,
         functions: 85,

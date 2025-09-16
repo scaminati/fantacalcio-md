@@ -9,6 +9,7 @@ export default defineConfig({
     include: ['test/**/*.test.ts'],
     coverage: {
       include: ['src'],
+      reportOnFailure: true,
       thresholds: {
         lines: 85,
         functions: 85,
