@@ -5,6 +5,11 @@ import { redirect } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { isAuthenticated } from "@/lib/session";
 
+vi.mock("@/lib/session", () => ({
+  isAuthenticated: vi.fn(),
+  deleteSession: vi.fn(),
+}));
+
 describe("Navbar component", () => {
   test("Show navbar when user is not autenticated", async () => {
     vi.mocked(isAuthenticated).mockResolvedValueOnce(false);
