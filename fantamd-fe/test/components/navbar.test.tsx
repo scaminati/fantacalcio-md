@@ -10,6 +10,10 @@ vi.mock("@/lib/session", () => ({
   deleteSession: vi.fn(),
 }));
 
+vi.mock("next/navigation", () => ({
+  redirect: vi.fn(),
+}));
+
 describe("Navbar component", () => {
   test("Show navbar when user is not autenticated", async () => {
     vi.mocked(isAuthenticated).mockResolvedValueOnce(false);
