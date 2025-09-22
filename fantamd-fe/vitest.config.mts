@@ -16,6 +16,7 @@ export default defineConfig({
     include: ['test/**/*.test.ts', 'test/**/*.test.tsx'],
     coverage: {
       include: ['app', 'components', 'lib'],
+      exclude: ['app/providers.tsx'],
       reporter: ['text', 'json-summary', 'json'],
       reportOnFailure: true,
       thresholds: {
@@ -25,6 +26,6 @@ export default defineConfig({
         statements: 85
       }
     },
-    setupFiles: ['test/test-setup.ts'],
+    setupFiles: ['test/test-setup.tsx'],
   }
 })

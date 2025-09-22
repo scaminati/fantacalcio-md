@@ -67,7 +67,7 @@ export default function CompetitorsTable() {
 
       if (result?.error) {
         addToast({
-          title: result?.error || "Errore nel recupero dei partecipanti",
+          title: result?.error,
           color: "danger",
         });
       } else {
@@ -120,6 +120,7 @@ export default function CompetitorsTable() {
             <Chip
               className="capitalize border-none gap-1 text-default-600"
               color={cellValue ? "success" : "danger"}
+              data-testid="added-chip"
               size="sm"
               variant="dot"
             >
@@ -131,19 +132,27 @@ export default function CompetitorsTable() {
             <div className="relative flex justify-end items-center gap-2">
               <Dropdown className="bg-background border-1 border-default-200">
                 <DropdownTrigger>
-                  <Button isIconOnly radius="full" size="sm" variant="light">
+                  <Button
+                    isIconOnly
+                    data-testid="actions-btn"
+                    radius="full"
+                    size="sm"
+                    variant="light"
+                  >
                     <EllipsisVerticalIcon className="text-default-400" />
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu>
                   <DropdownItem
                     key="edit"
+                    data-testid="edit-btn"
                     onPress={() => setModalCompetitor(item)}
                   >
                     Modifica
                   </DropdownItem>
                   <DropdownItem
                     key="delete"
+                     data-testid="delete-btn"
                     onPress={() => setDeleteCompetitor(item)}
                   >
                     Elimina
@@ -183,7 +192,7 @@ export default function CompetitorsTable() {
               }}
               setModalCompetitor={setModalCompetitor}
             />
-            <Table>
+            <Table data-testid="competitors-table">
               <TableHeader columns={columns}>
                 {(column) => (
                   <TableColumn
@@ -197,7 +206,7 @@ export default function CompetitorsTable() {
               <TableBody
                 emptyContent={"Nessun partecipante trovato"}
                 items={competitors}
-                loadingContent={<Spinner />}
+                loadingContent={<Spinner data-testid="competitor-spinner" />}
                 loadingState={loadingState}
               >
                 {(item: Competitor) => (
@@ -219,6 +228,7 @@ export default function CompetitorsTable() {
               showControls
               showShadow
               color="primary"
+              data-testid="pagination"
               page={page}
               total={totalPages}
               onChange={(page) => setPage(page)}
@@ -249,7 +259,7 @@ export default function CompetitorsTable() {
         competitor={deleteCompetitor}
         onCloseEvent={onCompetitorModalClosed}
         onDeleteEvent={() => {
-          if (competitors.length == 1) {
+          if (competitors.length == 1 && page > 1) {
             setPage(page - 1);
           } else {
             loadCompetitors();
