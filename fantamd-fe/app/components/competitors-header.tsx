@@ -27,6 +27,7 @@ export default function CompetitorsHeader({
         <Button
           isIconOnly
           color="primary"
+          data-testid="search-icon"
           size="sm"
           onPress={() => applyFilterChange(filterValue)}
         >

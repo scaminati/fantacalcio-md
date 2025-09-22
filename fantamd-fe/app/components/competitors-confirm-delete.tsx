@@ -35,7 +35,7 @@ export default function CompetitorConfirmDelete({
 
       if (result?.error) {
         addToast({
-          title: result?.error || "Cancellazione partecipante fallita",
+          title: result?.error,
           color: "danger",
         });
       } else {

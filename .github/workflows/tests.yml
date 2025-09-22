@@ -17,6 +17,10 @@ jobs:
     defaults:
       run:
         working-directory: ./fantamd-be
+
+    permissions:
+      contents: read
+      pull-requests: write
         
     steps:
       - uses: actions/checkout@v5
@@ -37,3 +41,48 @@ jobs:
       - name: Run tests with coverage and containers
         run: npm run test:run
 
+      - name: 'Report Coverage'
+        if: always()
+        uses:  davelosert/vitest-coverage-report-action@v2
+        with: 
+          working-directory: ./fantamd-be
+        
+  fantamd-fe-tests:
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: fantamd-fe-tests
+      cancel-in-progress: true
+
+    defaults:
+      run:
+        working-directory: ./fantamd-fe
+
+    permissions:
+      contents: read
+      pull-requests: write
+        
+    steps:
+      - uses: actions/checkout@v5
+      
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+          cache-dependency-path: fantamd-fe/package-lock.json
+          
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build --if-present
+      
+      - name: Run tests with coverage and containers
+        run: npm run test:run
+      
+      - name: 'Report Coverage'
+        if: always()
+        uses:  davelosert/vitest-coverage-report-action@v2
+        with: 
+          working-directory: ./fantamd-fe

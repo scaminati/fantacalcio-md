@@ -15,7 +15,7 @@ export interface Competitor {
 
 export interface CompetitorPage {
   total: number;
-  results: [Competitor];
+  results: Competitor[] | undefined;
 }
 
 export interface Auth {

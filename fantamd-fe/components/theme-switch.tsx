@@ -39,6 +39,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
 
   return (
     <Component
+      data-testid="switch-btn"
       {...getBaseProps({
         className: clsx(
           "px-px transition-opacity hover:opacity-80 cursor-pointer",
@@ -70,9 +71,9 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
         })}
       >
         {!isSelected || isSSR ? (
-          <SunIcon className="size-6" />
+          <SunIcon className="size-6" data-testid="sun-icon" />
         ) : (
-          <MoonIcon className="size-6" />
+          <MoonIcon className="size-6" data-testid="moon-icon" />
         )}
       </div>
     </Component>

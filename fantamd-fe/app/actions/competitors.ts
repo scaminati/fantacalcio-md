@@ -66,9 +66,11 @@ export async function saveCompetitor(
   };
 }
 
-export async function deleteCompetitor(
-  competitor: Competitor,
-): Promise<ActionResponse<void>> {
+export async function deleteCompetitor(competitor: Competitor): Promise<
+  ActionResponse<{
+    id: number;
+  }>
+> {
   const token = await getToken();
 
   const res = await fetch(

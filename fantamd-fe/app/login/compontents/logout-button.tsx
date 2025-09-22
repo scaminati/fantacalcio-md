@@ -16,6 +16,7 @@ export default function LogoutButton() {
   return (
     <Button
       color="warning"
+      data-testid="logout-button"
       isLoading={isLoading}
       variant="flat"
       onPress={performLogout}

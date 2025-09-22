@@ -27,7 +27,7 @@ export default function LoginForm() {
       if (result?.error) {
         setIsLoading(false);
         addToast({
-          title: result?.error || "Accesso fallito",
+          title: result?.error,
           color: "danger",
         });
       } else {
