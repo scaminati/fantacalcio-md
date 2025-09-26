@@ -109,12 +109,17 @@ export default function CompetitorsTable() {
               classNames={{
                 description: "text-default-500",
               }}
+              data-testid="user"
               description={item.email}
               name={cellValue}
             />
           );
         case "paid":
-          return <span className="font-semibold">{cellValue}</span>;
+          return (
+            <span className="font-semibold" data-testid="paid">
+              {cellValue}
+            </span>
+          );
         case "added_into_app":
           return (
             <Chip
@@ -152,7 +157,7 @@ export default function CompetitorsTable() {
                   </DropdownItem>
                   <DropdownItem
                     key="delete"
-                     data-testid="delete-btn"
+                    data-testid="delete-btn"
                     onPress={() => setDeleteCompetitor(item)}
                   >
                     Elimina

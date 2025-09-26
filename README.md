@@ -56,10 +56,16 @@ The frontend is deployed on **Vercel** using Next.js's native support. Vercel ha
 ### 🔧 Scripts
 
 ```bash
-npm run dev     # Start development server
-npm run build   # Build for production
-npm start       # Start production server
-npm run lint    # Lint and fix code
+npm run dev               # Start development server
+npm run build             # Build for production
+npm start                 # Start production server
+npm run lint              # Lint and fix code
+npm test                  # Run unit test with watch mode
+npm run test:run          # Run unit test with coverage
+npm run test:ui           # Run unit test with UI
+npm run test:e2e          # Run integration test - need docker installed (CI compose)
+npm run test:e2e:ui       # Run integration test with UI - need docker installed (CI compose)
+npm run test:e2e:report   # Show last integration tests report - need docker installed (CI compose)
 ```
 
 ---
@@ -118,5 +124,14 @@ docker-compose up --build
    - pgAdmin: [http://localhost:9000](http://localhost:9000)
 
 > Use `admin@example.com` / `admin` to log into pgAdmin and connect to the `fantamd` database.
+
+### 🚀 How to Run for intgration tests
+
+1. Make sure Docker and Docker Compose are installed.
+2. From the root of the project, run:
+
+```bash
+docker compose -f docker-compose.ci.yml up --build
+```
 
 ---
