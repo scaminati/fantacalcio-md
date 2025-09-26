@@ -90,13 +90,8 @@ jobs:
   fantamd-e2e:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: ./fantamd-fe
-
     concurrency:
-      group: fantamd-be-e2e
+      group: fantamd-e2e
       cancel-in-progress: true
 
     steps:
@@ -110,12 +105,12 @@ jobs:
 
     - name: Install dependencies
       run: npm ci
+      working-directory: ./fantamd-fe
 
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
 
     - name: Start services with Docker Compose
-      working-directory: ../
       run: |
         docker compose -f docker-compose.ci.yml up -d --build
         docker compose ps
@@ -123,7 +118,6 @@ jobs:
     
     # Wait for the app to be actually ready (in addition to Docker healthcheck)
     - name: Wait for app to be ready
-      working-directory: ../
       run: |
         for i in {1..60}; do
           if curl -fsS http://localhost:3000 >/dev/null; then
@@ -137,6 +131,7 @@ jobs:
 
     - name: Run Playwright tests
       run: npm run test:e2e
+      working-directory: ./fantamd-fe
       
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
@@ -144,6 +139,7 @@ jobs:
         name: playwright-report
         path: playwright-report/
         retention-days: 30
+        working-directory: ./fantamd-fe
 
     
     - name: Shutdown Docker Compose
