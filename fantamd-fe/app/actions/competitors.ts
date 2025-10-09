@@ -1,40 +1,8 @@
 "use server";
 
 import envConfig from "@/config/envConfig";
-import {
-  ActionResponse,
-  Competitor,
-  CompetitorPage,
-} from "@/interfaces/interfaces";
+import { ActionResponse, Competitor } from "@/interfaces/interfaces";
 import { getToken } from "@/lib/session";
-
-export async function getCompetitors(
-  page: number,
-  limit: number,
-  search: string,
-): Promise<ActionResponse<CompetitorPage>> {
-  const token = await getToken();
-  const res = await fetch(
-    `${envConfig.BE_URL}/api/competitors?page=${page}&limit=${limit}&search=${search}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
-
-  const respBody = await res.json();
-
-  if (!res.ok) {
-    return {
-      error: respBody.message || "Errore nel recupero dei partecipanti",
-    };
-  }
-
-  return {
-    data: respBody,
-  };
-}
 
 export async function saveCompetitor(
   competitor: Competitor,

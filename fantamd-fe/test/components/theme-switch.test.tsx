@@ -1,12 +1,14 @@
 import { describe, expect, test } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import { ThemeProvider } from "next-themes";
+
+import { renderWithAdapter } from "../custom-renders";
 
 import { ThemeSwitch } from "@/components/theme-switch";
 
 describe("ThemeSwitch component", () => {
   test("Render button and swith to dark theme", async () => {
-    render(
+    renderWithAdapter(
       <ThemeProvider attribute="class" defaultTheme="light">
         <ThemeSwitch />
       </ThemeProvider>,
@@ -20,7 +22,7 @@ describe("ThemeSwitch component", () => {
   });
 
   test("Render button and swith to light theme", async () => {
-    render(
+    renderWithAdapter(
       <ThemeProvider attribute="class" defaultTheme="dark">
         <ThemeSwitch classNames={{ label: "test" }} />
       </ThemeProvider>,

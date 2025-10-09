@@ -3,6 +3,10 @@ export interface ActionResponse<T> {
   error?: string;
 }
 
+export interface ApiHandlerError {
+  error: string;
+}
+
 export interface Competitor {
   id: number | undefined;
   fullname: string;
@@ -15,7 +19,7 @@ export interface Competitor {
 
 export interface CompetitorPage {
   total: number;
-  results: Competitor[] | undefined;
+  results: Competitor[];
 }
 
 export interface Auth {

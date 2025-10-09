@@ -12,7 +12,7 @@ import {
 } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import { Spinner } from "@heroui/spinner";
-import { Key, LoadingState } from "@react-types/shared";
+import { Key } from "@react-types/shared";
 import { addToast } from "@heroui/toast";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
 import {
@@ -24,13 +24,15 @@ import {
 import { Button } from "@heroui/button";
 import { User } from "@heroui/user";
 import { Chip } from "@heroui/chip";
+import useSWR from "swr";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 
 import CompetitorsHeader from "./competitors-header";
 import CompetitorsModal from "./competitors-modal";
 import CompetitorConfirmDelete from "./competitors-confirm-delete";
 
-import { getCompetitors } from "@/app/actions/competitors";
-import { Competitor } from "@/interfaces/interfaces";
+import { Competitor, CompetitorPage } from "@/interfaces/interfaces";
+import { fetcherWithError } from "@/lib/swr-utils";
 
 const columns = [
   { name: "NOME", uid: "fullname" },
@@ -47,44 +49,38 @@ const colors = [
   "danger",
 ] as const;
 
+const limit = 15;
+
 export default function CompetitorsTable() {
-  const limit = 15;
-  const [page, setPage] = React.useState(1);
-  const [competitors, setCompetitors] = React.useState<Competitor[]>([]);
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [modalCompetitor, setModalCompetitor] = React.useState<Competitor>();
   const [deleteCompetitor, setDeleteCompetitor] = React.useState<Competitor>();
-  const [filterValue, setFilterValue] = React.useState("");
-  const [totalPages, setTotalPages] = React.useState(0);
-  const [loadingState, setLoadingState] =
-    React.useState<LoadingState>("loading");
+  const [filterValue, setFilterValue] = useQueryState(
+    "search",
+    parseAsString.withDefault(""),
+  );
 
-  const loadCompetitors = async () => {
-    setCompetitors([]);
-    setLoadingState("loading");
-
-    try {
-      const result = await getCompetitors(page, limit, filterValue);
-
-      if (result?.error) {
+  const fetcher = React.useCallback(fetcherWithError, []);
+  const { data, isValidating, mutate } = useSWR<CompetitorPage>(
+    `/api/competitors?page=${page}&limit=${limit}&search=${filterValue}`,
+    {
+      fetcher,
+      shouldRetryOnError: false,
+      onError: (error) => {
         addToast({
-          title: result?.error,
+          title: error.message,
           color: "danger",
         });
-      } else {
-        const data = result.data;
-
-        setTotalPages(data?.total ? Math.ceil(data.total / limit) : 0);
-        setCompetitors(data?.results || []);
-      }
-    } catch (_: any) {
-      addToast({
-        title: "Errore nella comunicazione",
-        color: "danger",
-      });
-    } finally {
-      setLoadingState("idle");
-    }
-  };
+      },
+    },
+  );
+  const totalPages = React.useMemo(
+    () => (data ? Math.ceil(data.total / limit) : 0),
+    [data],
+  );
+  const competitors = React.useMemo(() => {
+    return data?.results || [];
+  }, [data]);
 
   const renderCell = React.useCallback(
     (item: Competitor, columnKey: Key) => {
@@ -178,10 +174,6 @@ export default function CompetitorsTable() {
     setDeleteCompetitor(undefined);
   };
 
-  React.useEffect(() => {
-    loadCompetitors();
-  }, [page, filterValue]);
-
   return (
     <>
       <div className="flex flex-col h-full">
@@ -190,9 +182,10 @@ export default function CompetitorsTable() {
             <CompetitorsHeader
               applyFilterChange={(newValue) => {
                 if (newValue != filterValue) {
+                  setPage(1);
                   setFilterValue(newValue);
                 } else {
-                  loadCompetitors();
+                  mutate();
                 }
               }}
               setModalCompetitor={setModalCompetitor}
@@ -210,9 +203,9 @@ export default function CompetitorsTable() {
               </TableHeader>
               <TableBody
                 emptyContent={"Nessun partecipante trovato"}
-                items={competitors}
+                items={isValidating ? [] : competitors}
                 loadingContent={<Spinner data-testid="competitor-spinner" />}
-                loadingState={loadingState}
+                loadingState={isValidating ? "loading" : "idle"}
               >
                 {(item: Competitor) => (
                   <TableRow key={item?.id}>
@@ -246,16 +239,19 @@ export default function CompetitorsTable() {
         onCloseEvent={onCompetitorModalClosed}
         onSavedEvent={(savedCompetitor) => {
           if (modalCompetitor!.id) {
-            setCompetitors((prev) =>
-              prev.map((c) =>
+            const updatedData: CompetitorPage = {
+              ...(data as CompetitorPage),
+              results: data!.results.map((c) =>
                 c.id === savedCompetitor.id ? savedCompetitor : c,
               ),
-            );
+            };
+
+            mutate(updatedData, { revalidate: false });
           } else {
             if (page > 1) {
               setPage(1);
             } else {
-              loadCompetitors();
+              mutate();
             }
           }
         }}
@@ -267,7 +263,7 @@ export default function CompetitorsTable() {
           if (competitors.length == 1 && page > 1) {
             setPage(page - 1);
           } else {
-            loadCompetitors();
+            mutate();
           }
         }}
       />
