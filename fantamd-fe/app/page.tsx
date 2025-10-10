@@ -1,9 +1,11 @@
-import { connection } from "next/server";
+import { Suspense } from "react";
 
 import CompetitorsTable from "@/app/components/competitors-table";
 
-export default async function Home() {
-  await connection();
-
-  return <CompetitorsTable />;
+export default function Home() {
+  return (
+    <Suspense>
+      <CompetitorsTable />
+    </Suspense>
+  );
 }
