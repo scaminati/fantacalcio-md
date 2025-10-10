@@ -1,6 +1,8 @@
 import { describe, expect, test, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { redirect } from "next/navigation";
+
+import { renderWithAdapter } from "../custom-renders";
 
 import { Navbar } from "@/components/navbar";
 import { isAuthenticated } from "@/lib/session";
@@ -18,7 +20,7 @@ describe("Navbar component", () => {
   test("Show navbar when user is not autenticated", async () => {
     vi.mocked(isAuthenticated).mockResolvedValueOnce(false);
 
-    render(await Navbar());
+    renderWithAdapter(await Navbar());
 
     expect(isAuthenticated).toHaveBeenCalledOnce();
 
@@ -32,7 +34,7 @@ describe("Navbar component", () => {
   test("Show navbar when user is autenticated", async () => {
     vi.mocked(isAuthenticated).mockResolvedValueOnce(true);
 
-    render(await Navbar());
+    renderWithAdapter(await Navbar());
 
     expect(isAuthenticated).toHaveBeenCalledOnce();
 
@@ -46,7 +48,7 @@ describe("Navbar component", () => {
   test("Perform logout after button click", async () => {
     vi.mocked(isAuthenticated).mockResolvedValueOnce(true);
 
-    render(await Navbar());
+    renderWithAdapter(await Navbar());
 
     const logoutButton = await screen.findByTestId("logout-button");
 

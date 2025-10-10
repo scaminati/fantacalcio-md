@@ -1,6 +1,8 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 import { Icons } from "next/dist/lib/metadata/types/metadata-types";
+
+import { renderWithAdapter } from "../custom-renders";
 
 import RootLayout, { metadata, viewport } from "@/app/layout";
 import Home from "@/app/page";
@@ -20,7 +22,7 @@ describe("Home page component", () => {
   });
 
   test("Should render login page", () => {
-    render(<Home />);
+    renderWithAdapter(<Home />);
     expect(screen.getByTestId("competitors-table")).toBeDefined();
   });
 
@@ -28,7 +30,7 @@ describe("Home page component", () => {
     const err = new global.Error("Error");
     const resetMock = vi.fn();
 
-    render(<Error error={err} reset={resetMock} />);
+    renderWithAdapter(<Error error={err} reset={resetMock} />);
     expect(
       screen.getByRole("heading", { name: /something went wrong!/i }),
     ).toBeDefined();

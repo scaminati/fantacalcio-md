@@ -1,55 +1,13 @@
 import { describe, expect, test, vi } from "vitest";
 
-import { competitorMock, competitorsResult } from "@/test/test-utils";
-import {
-  deleteCompetitor,
-  getCompetitors,
-  saveCompetitor,
-} from "@/app/actions/competitors";
+import { competitorMock } from "@/test/test-utils";
+import { deleteCompetitor, saveCompetitor } from "@/app/actions/competitors";
 
 vi.mock("@/lib/session", () => ({
   getToken: vi.fn().mockResolvedValue("token"),
 }));
 
 describe("Competitors actions", () => {
-  test("Perform getCompetitors action successfully", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => competitorsResult.data,
-    } as Response);
-    const result = await getCompetitors(1, 10, "search");
-
-    expect(fetch).toHaveBeenCalledExactlyOnceWith(
-      expect.stringMatching(/page=1.*limit=10.*search=search/),
-      expect.anything(),
-    );
-    expect(result.data).toBe(competitorsResult.data);
-  });
-
-  test("Send error if getCompetitors action fails", async () => {
-    const errorResponse = "Api error";
-
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({
-        message: errorResponse,
-      }),
-    } as Response);
-    const result = await getCompetitors(1, 10, "search");
-
-    expect(result.error).toBe(errorResponse);
-  });
-
-  test("Send error if getCompetitors action fails without error message", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({}),
-    } as Response);
-    const result = await getCompetitors(1, 10, "search");
-
-    expect(result.error).toBe("Errore nel recupero dei partecipanti");
-  });
-
   test("Perform saveCompetitor with new object successfully", async () => {
     let newCompetitor = { ...competitorMock, id: undefined };
 

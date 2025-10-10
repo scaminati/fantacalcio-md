@@ -1,10 +1,11 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 import { addToast } from "@heroui/toast";
 
 import LoginPage from "@/app/login/page";
 import { login } from "@/app/actions/auth";
 import LoginLayout from "@/app/login/layout";
+import { renderWithAdapter } from "@/test/custom-renders";
 
 vi.mock("@/app/actions/auth", () => ({
   login: vi.fn(),
@@ -24,7 +25,7 @@ vi.mock("next/navigation", () => ({
 
 describe("Login page component", () => {
   test("Should render login layout with child", () => {
-    render(
+    renderWithAdapter(
       <LoginLayout>
         <span>Test layout component</span>
       </LoginLayout>,
@@ -33,7 +34,7 @@ describe("Login page component", () => {
   });
 
   test("Should render login page", () => {
-    render(<LoginPage />);
+    renderWithAdapter(<LoginPage />);
     expect(
       screen.getByRole("heading", {
         level: 2,
@@ -47,7 +48,7 @@ describe("Login page component", () => {
 
   test("Should navigate to '/' after submit successfully", async () => {
     vi.mocked(login).mockResolvedValueOnce({ data: { token: "token" } });
-    render(<LoginPage />);
+    renderWithAdapter(<LoginPage />);
     fireEvent.change(screen.getByLabelText(/username/i), {
       target: { value: "admin" },
     });
@@ -64,7 +65,7 @@ describe("Login page component", () => {
 
   test("Should show error toast on failed login", async () => {
     vi.mocked(login).mockResolvedValueOnce({ error: "Invalid credentials" });
-    render(<LoginPage />);
+    renderWithAdapter(<LoginPage />);
     fireEvent.change(screen.getByLabelText(/username/i), {
       target: { value: "admin" },
     });
@@ -86,7 +87,7 @@ describe("Login page component", () => {
     vi.mocked(login).mockImplementationOnce(() => {
       throw new Error("Network error");
     });
-    render(<LoginPage />);
+    renderWithAdapter(<LoginPage />);
     fireEvent.change(screen.getByLabelText(/username/i), {
       target: { value: "admin" },
     });

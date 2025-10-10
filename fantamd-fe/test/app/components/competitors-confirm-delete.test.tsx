@@ -1,15 +1,9 @@
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 import { addToast } from "@heroui/toast";
 
 import CompetitorsTable from "@/app/components/competitors-table";
-import { deleteCompetitor, getCompetitors } from "@/app/actions/competitors";
+import { deleteCompetitor } from "@/app/actions/competitors";
 import {
   competitorMock,
   competitorsResult,
@@ -17,12 +11,12 @@ import {
   generateCompetitorsPage,
 } from "@/test/test-utils";
 import CompetitorConfirmDelete from "@/app/components/competitors-confirm-delete";
+import { renderWithAdapter } from "@/test/custom-renders";
 
 const pageLimit = 15;
 const totalValues = 16;
 
 vi.mock("@/app/actions/competitors", () => ({
-  getCompetitors: vi.fn(),
   deleteCompetitor: vi.fn(),
 }));
 
@@ -55,61 +49,67 @@ describe("Competitors delete component", () => {
   };
 
   test("Should delete competitor successfully and reload", async () => {
-    vi.mocked(getCompetitors).mockResolvedValueOnce(competitorsResult);
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => competitorsResult,
+    } as Response);
     vi.mocked(deleteCompetitor).mockResolvedValueOnce({});
 
-    render(<CompetitorsTable />);
+    renderWithAdapter(<CompetitorsTable />);
 
     await deleteAction();
 
     expect(deleteCompetitor).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({
-        id: competitorsResult.data?.results[0].id,
+        id: competitorsResult.results[0].id,
       }),
     );
-    expect(getCompetitors).toHaveBeenCalledTimes(2);
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   test("Should delete competitor second page row successfully and set previous page", async () => {
-    vi.mocked(getCompetitors).mockResolvedValue(
-      generateCompetitorsPage(1, totalValues, pageLimit),
-    );
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => generateCompetitorsPage(1, totalValues, pageLimit),
+    } as Response);
     vi.mocked(deleteCompetitor).mockResolvedValueOnce({});
 
-    render(<CompetitorsTable />);
+    renderWithAdapter(<CompetitorsTable />);
 
-    await waitFor(() => {
-      const pagination = screen.getByTestId("pagination");
+    await screen.findByTestId("pagination");
 
-      vi.mocked(getCompetitors).mockResolvedValueOnce(
-        generateCompetitorsPage(2, totalValues, pageLimit),
-      );
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => generateCompetitorsPage(2, totalValues, pageLimit),
+    } as Response);
 
-      fireEvent.click(
-        within(pagination).getByRole("button", {
-          name: /2/,
-        }),
-      );
-    });
-
-    vi.mocked(getCompetitors).mockResolvedValueOnce(
-      generateCompetitorsPage(1, totalValues - 1, pageLimit),
+    fireEvent.click(
+      within(screen.getByTestId("pagination")).getByRole("button", {
+        name: /2/,
+      }),
     );
 
     await waitFor(() => {
       expect(getBodyRows()).toHaveLength(totalValues - pageLimit);
     });
 
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => generateCompetitorsPage(1, totalValues - 1, pageLimit),
+    } as Response);
+
     await deleteAction();
 
-    expect(getCompetitors).toHaveBeenCalledWith(1, pageLimit, "");
-    expect(getCompetitors).toHaveBeenCalledTimes(3);
+    expect(fetch).toHaveBeenCalledWith(
+      `/api/competitors?page=1&limit=${pageLimit}&search=`,
+    );
+    expect(fetch).toHaveBeenCalledTimes(3);
   });
 
   test("Should render toast with error on delete api", async () => {
     vi.mocked(deleteCompetitor).mockResolvedValueOnce(networkErrorResult);
 
-    render(
+    renderWithAdapter(
       <CompetitorConfirmDelete
         competitor={competitorMock}
         onCloseEvent={vi.fn()}
@@ -131,7 +131,7 @@ describe("Competitors delete component", () => {
       throw new Error("Generic error");
     });
 
-    render(
+    renderWithAdapter(
       <CompetitorConfirmDelete
         competitor={competitorMock}
         onCloseEvent={vi.fn()}

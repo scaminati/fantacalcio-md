@@ -1,28 +1,18 @@
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 import { addToast } from "@heroui/toast";
 
 import CompetitorsTable from "@/app/components/competitors-table";
-import { getCompetitors } from "@/app/actions/competitors";
 import {
   competitorsResult,
   emptyCompetitorsResult,
   networkErrorResult,
   generateCompetitorsPage,
 } from "@/test/test-utils";
+import { renderWithAdapter } from "@/test/custom-renders";
 
 const pageLimit = 15;
 const totalValues = 20;
-
-vi.mock("@/app/actions/competitors", () => ({
-  getCompetitors: vi.fn(),
-}));
 
 vi.mock("@heroui/toast", () => ({
   addToast: vi.fn(),
@@ -35,48 +25,60 @@ const getBodyRows = () => {
   return allRows.filter((row) => row.closest("tbody"));
 };
 
+const expectedFetchUrlRegex = (page: number, filterValue: string) =>
+  new RegExp(
+    `/api/competitors\\?page=${page}&limit=\\d+&search=${filterValue}`,
+  );
+
 describe("Competitors table component", () => {
   test("Should render competitor table component", () => {
-    render(<CompetitorsTable />);
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => competitorsResult,
+    } as Response);
+    renderWithAdapter(<CompetitorsTable />);
     expect(screen.getByTestId("competitors-table")).toBeDefined();
   });
 
   test("Should render empty table if no competitors exists ", async () => {
-    vi.mocked(getCompetitors).mockResolvedValueOnce(emptyCompetitorsResult);
-
-    render(<CompetitorsTable />);
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => emptyCompetitorsResult,
+    } as Response);
+    renderWithAdapter(<CompetitorsTable />);
     await waitFor(() => {
       expect(screen.getByText("Nessun partecipante trovato")).toBeDefined();
     });
   });
 
   test("Should render empty table if api don't return results data", async () => {
-    vi.mocked(getCompetitors).mockResolvedValueOnce({
-      data: {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
         total: 0,
         results: undefined,
-      },
-    });
-
-    render(<CompetitorsTable />);
+      }),
+    } as Response);
+    renderWithAdapter(<CompetitorsTable />);
     await waitFor(() => {
       expect(screen.getByText("Nessun partecipante trovato")).toBeDefined();
     });
   });
 
   test("Should render table first page with competitors", async () => {
-    vi.mocked(getCompetitors).mockResolvedValueOnce(competitorsResult);
-
-    render(<CompetitorsTable />);
-
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => competitorsResult,
+    } as Response);
+    renderWithAdapter(<CompetitorsTable />);
     expect(screen.getByTestId("competitor-spinner")).toBeDefined();
     await waitFor(() => {
       const bodyRows = getBodyRows();
 
-      expect(bodyRows).toHaveLength(competitorsResult.data!.total);
+      expect(bodyRows).toHaveLength(competitorsResult.total);
 
       const firstRow = bodyRows[0];
-      const firstCompetitor = competitorsResult.data!.results![0];
+      const firstCompetitor = competitorsResult.results![0];
       const firstChip =
         within(firstRow).getByTestId("added-chip").firstElementChild;
       const chipColor = firstCompetitor.added_into_app
@@ -89,26 +91,30 @@ describe("Competitors table component", () => {
       expect(within(firstRow).getByText(firstCompetitor.email)).toBeDefined();
       expect(within(firstRow).getByText(firstCompetitor.phone)).toBeDefined();
       expect(firstChip!.classList.contains(chipColor)).toBeTruthy();
-      expect(getCompetitors).toHaveBeenCalledExactlyOnceWith(
-        1,
-        expect.anything(),
-        "",
+      expect(fetch).toHaveBeenCalledExactlyOnceWith(
+        expect.stringMatching(expectedFetchUrlRegex(1, "")),
       );
     });
   });
 
   test("Should reload competitors when filter change", async () => {
-    vi.mocked(getCompetitors).mockResolvedValueOnce(competitorsResult);
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => competitorsResult,
+    } as Response);
 
-    render(<CompetitorsTable />);
+    renderWithAdapter(<CompetitorsTable />);
 
     // table without search
     await waitFor(() => {
-      expect(getBodyRows()).toHaveLength(competitorsResult.data!.total);
+      expect(getBodyRows()).toHaveLength(competitorsResult.total);
     });
 
     // after search with empty list
-    vi.mocked(getCompetitors).mockResolvedValueOnce(emptyCompetitorsResult);
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => emptyCompetitorsResult,
+    } as Response);
     fireEvent.change(screen.getByLabelText(/cerca.../i), {
       target: { value: "Name" },
     });
@@ -118,25 +124,29 @@ describe("Competitors table component", () => {
     expect(
       await screen.findByText("Nessun partecipante trovato"),
     ).toBeDefined();
-    expect(getCompetitors).toHaveBeenCalledTimes(2);
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   test("Should render first page and then switch to second page", async () => {
-    vi.mocked(getCompetitors).mockResolvedValueOnce(
-      generateCompetitorsPage(1, totalValues, pageLimit),
-    );
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => generateCompetitorsPage(1, totalValues, pageLimit),
+    } as Response);
 
-    render(<CompetitorsTable />);
+    renderWithAdapter(<CompetitorsTable />);
 
     // table first page
     await waitFor(() => {
       expect(getBodyRows()[0].getAttribute("data-key")).toBe("1");
-      expect(getCompetitors).toHaveBeenCalledWith(1, expect.anything(), "");
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringMatching(expectedFetchUrlRegex(1, "")),
+      );
     });
 
-    vi.mocked(getCompetitors).mockResolvedValueOnce(
-      generateCompetitorsPage(2, totalValues, pageLimit),
-    );
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => generateCompetitorsPage(2, totalValues, pageLimit),
+    } as Response);
 
     const pagination = screen.getByTestId("pagination");
 
@@ -151,29 +161,39 @@ describe("Competitors table component", () => {
     // table first page
     await waitFor(() => {
       expect(getBodyRows()[0].getAttribute("data-key")).toBe("16");
-      expect(getCompetitors).toHaveBeenCalledWith(1, expect.anything(), "");
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringMatching(expectedFetchUrlRegex(1, "")),
+      );
     });
-    expect(getCompetitors).toHaveBeenCalledTimes(2);
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   test("Should render empty table if api error occurs", async () => {
-    vi.mocked(getCompetitors).mockResolvedValueOnce(networkErrorResult);
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: false,
+      json: async () => networkErrorResult,
+    } as Response);
 
-    render(<CompetitorsTable />);
+    renderWithAdapter(<CompetitorsTable />);
     await waitFor(() => {
       expect(screen.getByText("Nessun partecipante trovato")).toBeDefined();
       expect(addToast).toHaveBeenCalledWith({
-        title: "Network error",
+        title: networkErrorResult.error,
         color: "danger",
       });
     });
   });
 
   test("Should reload table after search button click with empty value", async () => {
-    vi.mocked(getCompetitors).mockResolvedValueOnce(emptyCompetitorsResult);
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => emptyCompetitorsResult,
+    } as Response);
 
-    render(<CompetitorsTable />);
+    renderWithAdapter(<CompetitorsTable />);
     fireEvent.click(screen.getByTestId("search-icon"));
-    expect(getCompetitors).toHaveBeenCalledTimes(2);
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledTimes(2);
+    });
   });
 });
