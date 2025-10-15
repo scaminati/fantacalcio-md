@@ -13,7 +13,6 @@ import {
 import { Pagination } from "@heroui/pagination";
 import { Spinner } from "@heroui/spinner";
 import { Key } from "@react-types/shared";
-import { addToast } from "@heroui/toast";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
 import {
   Dropdown,
@@ -24,15 +23,14 @@ import {
 import { Button } from "@heroui/button";
 import { User } from "@heroui/user";
 import { Chip } from "@heroui/chip";
-import useSWR from "swr";
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 
 import CompetitorsHeader from "./competitors-header";
 import CompetitorsModal from "./competitors-modal";
 import CompetitorConfirmDelete from "./competitors-confirm-delete";
 
-import { Competitor, CompetitorPage } from "@/interfaces/interfaces";
-import { fetcherWithError } from "@/lib/swr-utils";
+import { Competitor } from "@/interfaces/interfaces";
+import { listColors } from "@/lib/utils";
+import useCompetitorsFetch from "@/hooks/useCompetitorsFetch";
 
 const columns = [
   { name: "NOME", uid: "fullname" },
@@ -41,46 +39,22 @@ const columns = [
   { name: "AGGIUNTO IN APP", uid: "added_into_app" },
   { name: "", uid: "actions" },
 ];
-const colors = [
-  "primary",
-  "secondary",
-  "success",
-  "warning",
-  "danger",
-] as const;
 
-const limit = 15;
-
-export default function CompetitorsTable() {
-  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+export default function CompetitorsTable({ className, limit }: any) {
+  const {
+    page,
+    setPage,
+    filterValue,
+    setFilterValue,
+    competitors,
+    totalCount,
+    totalPages,
+    isValidating,
+    reloadData,
+    updateCompetitor,
+  } = useCompetitorsFetch();
   const [modalCompetitor, setModalCompetitor] = React.useState<Competitor>();
   const [deleteCompetitor, setDeleteCompetitor] = React.useState<Competitor>();
-  const [filterValue, setFilterValue] = useQueryState(
-    "search",
-    parseAsString.withDefault(""),
-  );
-
-  const fetcher = React.useCallback(fetcherWithError, []);
-  const { data, isValidating, mutate } = useSWR<CompetitorPage>(
-    `/api/competitors?page=${page}&limit=${limit}&search=${filterValue}`,
-    {
-      fetcher,
-      shouldRetryOnError: false,
-      onError: (error) => {
-        addToast({
-          title: error.message,
-          color: "danger",
-        });
-      },
-    },
-  );
-  const totalPages = React.useMemo(
-    () => (data ? Math.ceil(data.total / limit) : 0),
-    [data],
-  );
-  const competitors = React.useMemo(() => {
-    return data?.results || [];
-  }, [data]);
 
   const renderCell = React.useCallback(
     (item: Competitor, columnKey: Key) => {
@@ -95,10 +69,10 @@ export default function CompetitorsTable() {
                 radius: "full",
                 size: "sm",
                 color:
-                  colors[
+                  listColors[
                     competitors.findIndex(
                       (competitor) => competitor.id == item.id,
-                    ) % colors.length
+                    ) % listColors.length
                   ],
                 showFallback: true,
               }}
@@ -176,7 +150,7 @@ export default function CompetitorsTable() {
 
   return (
     <>
-      <div className="flex flex-col h-full">
+      <div className={`${className} flex-col h-full`}>
         <div className="flex-grow overflow-y-auto px-4">
           <div className="container mx-auto my-4 max-w-7xl">
             <CompetitorsHeader
@@ -185,12 +159,12 @@ export default function CompetitorsTable() {
                   setPage(1);
                   setFilterValue(newValue);
                 } else {
-                  mutate();
+                  reloadData();
                 }
               }}
               setModalCompetitor={setModalCompetitor}
             />
-            <Table data-testid="competitors-table">
+            <Table isHeaderSticky data-testid="competitors-table">
               <TableHeader columns={columns}>
                 {(column) => (
                   <TableColumn
@@ -219,8 +193,11 @@ export default function CompetitorsTable() {
           </div>
         </div>
 
-        {totalPages > 0 ? (
-          <div className="flex w-full justify-center py-3 border-t border-divider">
+        {totalPages > 0 && (
+          <div className="flex w-full p-3 justify-center border-t border-divider items-center">
+            <div className="text-foreground-600 text-tiny flex-grow">
+              {!filterValue && <span>Totale partecipanti: {totalCount}</span>}
+            </div>
             <Pagination
               isCompact
               showControls
@@ -228,30 +205,24 @@ export default function CompetitorsTable() {
               color="primary"
               data-testid="pagination"
               page={page}
+              size="sm"
               total={totalPages}
               onChange={(page) => setPage(page)}
             />
           </div>
-        ) : null}
+        )}
       </div>
       <CompetitorsModal
         competitor={modalCompetitor}
         onCloseEvent={onCompetitorModalClosed}
         onSavedEvent={(savedCompetitor) => {
           if (modalCompetitor!.id) {
-            const updatedData: CompetitorPage = {
-              ...(data as CompetitorPage),
-              results: data!.results.map((c) =>
-                c.id === savedCompetitor.id ? savedCompetitor : c,
-              ),
-            };
-
-            mutate(updatedData, { revalidate: false });
+            updateCompetitor(savedCompetitor);
           } else {
             if (page > 1) {
               setPage(1);
             } else {
-              mutate();
+              reloadData();
             }
           }
         }}
@@ -263,7 +234,7 @@ export default function CompetitorsTable() {
           if (competitors.length == 1 && page > 1) {
             setPage(page - 1);
           } else {
-            mutate();
+            reloadData();
           }
         }}
       />

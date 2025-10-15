@@ -93,7 +93,7 @@ export default function CompetitorsModal({
             <ModalBody className="w-full">
               <Input
                 isRequired
-                disabled={isSubmitting}
+                isDisabled={isSubmitting}
                 label="Nome"
                 placeholder="Inserisci il nome"
                 type="text"
@@ -102,8 +102,8 @@ export default function CompetitorsModal({
               />
               <Input
                 isRequired
-                disabled={isSubmitting}
                 endContent={<EnvelopeIcon className="size-4" />}
+                isDisabled={isSubmitting}
                 label="Email"
                 placeholder="Inserisci l'email"
                 type="email"
@@ -112,8 +112,8 @@ export default function CompetitorsModal({
               />
               <Input
                 isRequired
-                disabled={isSubmitting}
                 endContent={<DevicePhoneMobileIcon className="size-4" />}
+                isDisabled={isSubmitting}
                 label="Telefono"
                 placeholder="Inserisci il telefono"
                 type="text"
@@ -122,7 +122,7 @@ export default function CompetitorsModal({
               />
               <Input
                 isRequired
-                disabled={isSubmitting}
+                isDisabled={isSubmitting}
                 label="Pagato"
                 placeholder="Inserisci se ha pagato"
                 type="text"
@@ -131,7 +131,7 @@ export default function CompetitorsModal({
               />
               <div className="flex py-2 px-1 justify-between">
                 <Checkbox
-                  disabled={isSubmitting}
+                  isDisabled={isSubmitting}
                   {...register("added_into_app")}
                 >
                   Aggiunto in APP
