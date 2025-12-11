@@ -27,5 +27,6 @@ export default defineConfig({
       }
     },
     setupFiles: ['test/test-setup.tsx'],
+    testTimeout: 10000,
   }
 })

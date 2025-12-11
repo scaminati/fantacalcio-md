@@ -13,6 +13,7 @@ import {
 import CompetitorsModal from "@/app/components/competitors-modal";
 import { Competitor } from "@/interfaces/interfaces";
 import { renderWithAdapter } from "@/test/custom-renders";
+import CompetitorsMobileList from "@/app/components/competitors-mobile-list";
 
 const pageLimit = 15;
 const totalValues = 20;
@@ -32,185 +33,230 @@ const getBodyRows = () => {
   return allRows.filter((row) => row.closest("tbody"));
 };
 
-describe("Competitors modal component", () => {
-  const addCompetitorAction = async () => {
-    const addBtn = screen.getByRole("button", { name: /aggiungi/i });
+const getCardRows = () => screen.getAllByTestId("competitor-card");
 
-    fireEvent.click(addBtn);
-    await waitFor(() => {
-      fillForm(screen.getByRole("dialog"));
-    });
+const addCompetitorAction = async () => {
+  const addBtn = screen.getByRole("button", { name: /aggiungi/i });
 
-    await waitFor(() => {
-      expect(screen.queryByRole("dialog")).toBeNull();
-    });
-  };
+  fireEvent.click(addBtn);
+  await waitFor(() => {
+    fillForm(screen.getByRole("dialog"));
+  });
 
-  const fillForm = (dialog: HTMLElement) => {
-    // fill all fields
+  await waitFor(() => {
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+};
+
+const fillForm = (dialog: HTMLElement) => {
+  // fill all fields
+  fireEvent.change(within(dialog).getByLabelText(/nome/i), {
+    target: { value: competitorMock.fullname },
+  });
+  fireEvent.change(within(dialog).getByLabelText(/email/i), {
+    target: { value: competitorMock.email },
+  });
+  fireEvent.change(within(dialog).getByLabelText(/telefono/i), {
+    target: { value: competitorMock.phone },
+  });
+  fireEvent.change(within(dialog).getByLabelText(/pagato/i), {
+    target: { value: competitorMock.paid },
+  });
+  fireEvent.click(within(dialog).getByLabelText(/aggiunto in app/i));
+
+  fireEvent.click(within(dialog).getByRole("button", { name: /salva/i }));
+};
+
+const testOpenCompetitorModal = async (
+  ComponentToRender: React.ComponentType,
+  getElementsFn: () => Array<HTMLElement>,
+) => {
+  vi.mocked(fetch).mockResolvedValueOnce({
+    ok: true,
+    json: async () => competitorsResult,
+  } as Response);
+
+  renderWithAdapter(<ComponentToRender />);
+
+  const addBtn = screen.getByRole("button", { name: /aggiungi/i });
+
+  fireEvent.click(addBtn);
+  await waitFor(() => {
+    const addDialog = screen.getByRole("dialog");
+
+    expect(addDialog).toBeDefined();
+    expect(within(addDialog).getByText("Aggiungi")).toBeDefined();
+    fireEvent.click(within(addDialog).getByRole("button", { name: /chiudi/i }));
+  });
+
+  await waitFor(() => {
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  const actionsBtn = await within(getElementsFn()[0]).findByTestId(
+    "actions-btn",
+  );
+
+  fireEvent.click(actionsBtn);
+  fireEvent.click(screen.getByTestId("edit-btn"));
+
+  await waitFor(() => {
+    const editDialog = screen.getByRole("dialog");
+
+    expect(editDialog).toBeDefined();
+    expect(within(editDialog).getByText("Modifica")).toBeDefined();
+  });
+};
+
+const testAddNewCompetitor = async (ComponentToRender: React.ComponentType) => {
+  vi.mocked(fetch).mockResolvedValueOnce({
+    ok: true,
+    json: async () => competitorsResult,
+  } as Response);
+  vi.mocked(saveCompetitor).mockResolvedValueOnce({
+    data: competitorMock,
+  });
+
+  renderWithAdapter(<ComponentToRender />);
+
+  await addCompetitorAction();
+
+  expect(saveCompetitor).toHaveBeenCalledExactlyOnceWith(
+    expect.objectContaining({
+      fullname: competitorMock.fullname,
+      email: competitorMock.email,
+      phone: competitorMock.phone,
+      paid: competitorMock.paid,
+    }),
+  );
+  expect(fetch).toHaveBeenCalledTimes(2);
+};
+
+const testEditCompetitorAndUpdate = async (
+  ComponentToRender: React.ComponentType,
+  getElementsFn: () => Array<HTMLElement>,
+) => {
+  vi.mocked(fetch).mockResolvedValueOnce({
+    ok: true,
+    json: async () => competitorsResult,
+  } as Response);
+  vi.mocked(saveCompetitor).mockResolvedValueOnce({
+    data: competitorMock,
+  });
+
+  renderWithAdapter(<ComponentToRender />);
+
+  await waitFor(() => {
+    fireEvent.click(within(getElementsFn()[0]).getByTestId("actions-btn"));
+    fireEvent.click(screen.getByTestId("edit-btn"));
+  });
+
+  await waitFor(() => {
+    const dialog = screen.getByRole("dialog");
+
     fireEvent.change(within(dialog).getByLabelText(/nome/i), {
       target: { value: competitorMock.fullname },
     });
-    fireEvent.change(within(dialog).getByLabelText(/email/i), {
-      target: { value: competitorMock.email },
-    });
-    fireEvent.change(within(dialog).getByLabelText(/telefono/i), {
-      target: { value: competitorMock.phone },
-    });
-    fireEvent.change(within(dialog).getByLabelText(/pagato/i), {
-      target: { value: competitorMock.paid },
-    });
-    fireEvent.click(within(dialog).getByLabelText(/aggiunto in app/i));
 
     fireEvent.click(within(dialog).getByRole("button", { name: /salva/i }));
-  };
+  });
 
+  await waitFor(() => {
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  expect(saveCompetitor).toHaveBeenCalledExactlyOnceWith(
+    expect.objectContaining({
+      fullname: competitorMock.fullname,
+    }),
+  );
+  expect(fetch).toHaveBeenCalledOnce();
+  expect(
+    within(getElementsFn()[0]).getByText(competitorMock.fullname),
+  ).toBeDefined();
+};
+
+const testAddCompetitorAndReload = async (
+  ComponentToRender: React.ComponentType,
+  getElementsFn: () => Array<HTMLElement>,
+) => {
+  vi.mocked(fetch).mockResolvedValueOnce({
+    ok: true,
+    json: async () => generateCompetitorsPage(1, totalValues, pageLimit),
+  } as Response);
+  vi.mocked(saveCompetitor).mockResolvedValueOnce({
+    data: competitorMock,
+  });
+
+  renderWithAdapter(<ComponentToRender />);
+
+  await screen.findByTestId("pagination");
+
+  vi.mocked(fetch).mockResolvedValueOnce({
+    ok: true,
+    json: async () => generateCompetitorsPage(2, totalValues, pageLimit),
+  } as Response);
+
+  fireEvent.click(
+    within(screen.getByTestId("pagination")).getByRole("button", {
+      name: /2/,
+    }),
+  );
+
+  await waitFor(() => {
+    expect(getElementsFn()).toHaveLength(totalValues - pageLimit);
+  });
+
+  vi.mocked(fetch).mockResolvedValueOnce({
+    ok: true,
+    json: async () => generateCompetitorsPage(2, totalValues + 1, pageLimit),
+  } as Response);
+
+  await addCompetitorAction();
+
+  expect(fetch).toHaveBeenCalledWith(
+    `/api/competitors?page=1&limit=${pageLimit}&search=`,
+  );
+  expect(fetch).toHaveBeenCalledTimes(3);
+};
+
+describe("Competitors modal component on table page", () => {
   test("Should open competitor add and edit modal", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => competitorsResult,
-    } as Response);
-
-    renderWithAdapter(<CompetitorsTable />);
-
-    const addBtn = screen.getByRole("button", { name: /aggiungi/i });
-
-    fireEvent.click(addBtn);
-    await waitFor(() => {
-      const addDialog = screen.getByRole("dialog");
-
-      expect(addDialog).toBeDefined();
-      expect(within(addDialog).getByText("Aggiungi")).toBeDefined();
-      fireEvent.click(
-        within(addDialog).getByRole("button", { name: /chiudi/i }),
-      );
-    });
-
-    await waitFor(() => {
-      expect(screen.queryByRole("dialog")).toBeNull();
-    });
-
-    const actionsBtn = await within(getBodyRows()[0]).findByTestId(
-      "actions-btn",
-    );
-
-    fireEvent.click(actionsBtn);
-    fireEvent.click(screen.getByTestId("edit-btn"));
-
-    await waitFor(() => {
-      const editDialog = screen.getByRole("dialog");
-
-      expect(editDialog).toBeDefined();
-      expect(within(editDialog).getByText("Modifica")).toBeDefined();
-    });
+    await testOpenCompetitorModal(CompetitorsTable, getBodyRows);
   });
 
   test("Should add new competitor", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => competitorsResult,
-    } as Response);
-    vi.mocked(saveCompetitor).mockResolvedValueOnce({
-      data: competitorMock,
-    });
-
-    renderWithAdapter(<CompetitorsTable />);
-
-    await addCompetitorAction();
-
-    expect(saveCompetitor).toHaveBeenCalledExactlyOnceWith(
-      expect.objectContaining({
-        fullname: competitorMock.fullname,
-        email: competitorMock.email,
-        phone: competitorMock.phone,
-        paid: competitorMock.paid,
-      }),
-    );
-    expect(fetch).toHaveBeenCalledTimes(2);
+    await testAddNewCompetitor(CompetitorsTable);
   });
 
   test("Should edit competitor and update directly table row", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => competitorsResult,
-    } as Response);
-    vi.mocked(saveCompetitor).mockResolvedValueOnce({
-      data: competitorMock,
-    });
-
-    renderWithAdapter(<CompetitorsTable />);
-
-    await waitFor(() => {
-      fireEvent.click(within(getBodyRows()[0]).getByTestId("actions-btn"));
-      fireEvent.click(screen.getByTestId("edit-btn"));
-    });
-
-    await waitFor(() => {
-      const dialog = screen.getByRole("dialog");
-
-      fireEvent.change(within(dialog).getByLabelText(/nome/i), {
-        target: { value: competitorMock.fullname },
-      });
-
-      fireEvent.click(within(dialog).getByRole("button", { name: /salva/i }));
-    });
-
-    await waitFor(() => {
-      expect(screen.queryByRole("dialog")).toBeNull();
-    });
-
-    expect(saveCompetitor).toHaveBeenCalledExactlyOnceWith(
-      expect.objectContaining({
-        fullname: competitorMock.fullname,
-      }),
-    );
-    expect(fetch).toHaveBeenCalledOnce();
-    expect(
-      within(getBodyRows()[0]).getByText(competitorMock.fullname),
-    ).toBeDefined();
+    await testEditCompetitorAndUpdate(CompetitorsTable, getBodyRows);
   });
 
   test("Should add new competitor and reload first page", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => generateCompetitorsPage(1, totalValues, pageLimit),
-    } as Response);
-    vi.mocked(saveCompetitor).mockResolvedValueOnce({
-      data: competitorMock,
-    });
+    await testAddCompetitorAndReload(CompetitorsTable, getBodyRows);
+  });
+});
 
-    renderWithAdapter(<CompetitorsTable />);
-
-    await screen.findByTestId("pagination");
-
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => generateCompetitorsPage(2, totalValues, pageLimit),
-    } as Response);
-
-    fireEvent.click(
-      within(screen.getByTestId("pagination")).getByRole("button", {
-        name: /2/,
-      }),
-    );
-
-    await waitFor(() => {
-      expect(getBodyRows()).toHaveLength(totalValues - pageLimit);
-    });
-
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => generateCompetitorsPage(2, totalValues + 1, pageLimit),
-    } as Response);
-
-    await addCompetitorAction();
-
-    expect(fetch).toHaveBeenCalledWith(
-      `/api/competitors?page=1&limit=${pageLimit}&search=`,
-    );
-    expect(fetch).toHaveBeenCalledTimes(3);
+describe("Competitors modal component on mobile list", () => {
+  test("Should open competitor add and edit modal", async () => {
+    await testOpenCompetitorModal(CompetitorsMobileList, getCardRows);
   });
 
+  test("Should add new competitor", async () => {
+    await testAddNewCompetitor(CompetitorsMobileList);
+  });
+
+  test("Should edit competitor and update directly table row", async () => {
+    await testEditCompetitorAndUpdate(CompetitorsMobileList, getCardRows);
+  });
+
+  test("Should add new competitor and reload first page", async () => {
+    await testAddCompetitorAndReload(CompetitorsMobileList, getCardRows);
+  });
+});
+
+describe("Competitors modal component", () => {
   test("Should render toast with error on save api", async () => {
     vi.mocked(saveCompetitor).mockResolvedValueOnce(networkErrorResult);
 

@@ -53,8 +53,8 @@ export default function LoginForm() {
           <Input
             required
             autoComplete="username"
-            disabled={isLoading}
             id="username"
+            isDisabled={isLoading}
             label="Username"
             name="username"
             type="text"
@@ -64,8 +64,8 @@ export default function LoginForm() {
           <Input
             required
             autoComplete="current-password"
-            disabled={isLoading}
             id="password"
+            isDisabled={isLoading}
             label="Password"
             name="password"
             type="password"
