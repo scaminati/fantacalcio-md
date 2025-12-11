@@ -11,7 +11,7 @@ import CompetitorCard, { CompetitorCardSkeleton } from "./competitor-card";
 import { Competitor } from "@/interfaces/interfaces";
 import useCompetitorsFetch from "@/hooks/useCompetitorsFetch";
 
-export default function CompetitorsMobileList({ className, limit }: any) {
+export default function CompetitorsMobileList({ className }: any) {
   const {
     page,
     setPage,

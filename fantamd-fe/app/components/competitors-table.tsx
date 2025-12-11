@@ -40,7 +40,7 @@ const columns = [
   { name: "", uid: "actions" },
 ];
 
-export default function CompetitorsTable({ className, limit }: any) {
+export default function CompetitorsTable({ className }: any) {
   const {
     page,
     setPage,

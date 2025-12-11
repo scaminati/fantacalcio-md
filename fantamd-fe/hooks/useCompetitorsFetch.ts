@@ -21,6 +21,7 @@ export default function useCompetitorsFetch() {
     {
       fetcher,
       shouldRetryOnError: false,
+      revalidateOnFocus: false,
       onError: (error) => {
         addToast({
           title: error.message,
@@ -41,18 +42,21 @@ export default function useCompetitorsFetch() {
     return data?.total || 0;
   }, [data]);
 
-  const reloadData = React.useCallback(() => mutate(), []);
+  const reloadData = React.useCallback(() => mutate(), [mutate]);
 
-  const updateCompetitor = React.useCallback((competitor: Competitor) => {
-    const updatedData: CompetitorPage = {
-      total: totalCount,
-      results: competitors.map((c) =>
-        c.id === competitor.id ? competitor : c,
-      ),
-    };
+  const updateCompetitor = React.useCallback(
+    (competitor: Competitor) => {
+      const updatedData: CompetitorPage = {
+        total: totalCount,
+        results: competitors.map((c) =>
+          c.id === competitor.id ? competitor : c,
+        ),
+      };
 
-    mutate(updatedData, { revalidate: false });
-  }, []);
+      mutate(updatedData, { revalidate: false });
+    },
+    [totalPages, competitors, totalCount, mutate],
+  );
 
   return {
     page,
