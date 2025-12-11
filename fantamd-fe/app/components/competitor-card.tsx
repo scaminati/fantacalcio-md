@@ -34,7 +34,7 @@ export default function CompetitorCard({
   setDeleteCompetitor,
 }: Props) {
   return (
-    <Card key={competitor.id}>
+    <Card key={competitor.id} data-testid="competitor-card">
       <CardHeader className="justify-between">
         <User
           avatarProps={{
@@ -118,7 +118,7 @@ export default function CompetitorCard({
 
 export function CompetitorCardSkeleton() {
   return (
-    <Card>
+    <Card data-testid="user-skeleton">
       <CardHeader className="justify-between">
         <Skeleton className="flex rounded-full w-8 h-8 mr-3" />
         <div className="w-full flex flex-col gap-2">

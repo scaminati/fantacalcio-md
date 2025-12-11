@@ -12,6 +12,7 @@ import {
 } from "@/test/test-utils";
 import CompetitorConfirmDelete from "@/app/components/competitors-confirm-delete";
 import { renderWithAdapter } from "@/test/custom-renders";
+import CompetitorsMobileList from "@/app/components/competitors-mobile-list";
 
 const pageLimit = 15;
 const totalValues = 16;
@@ -31,81 +32,109 @@ const getBodyRows = () => {
   return allRows.filter((row) => row.closest("tbody"));
 };
 
-describe("Competitors delete component", () => {
-  const deleteAction = async () => {
-    await waitFor(() => {
-      fireEvent.click(within(getBodyRows()[0]).getByTestId("actions-btn"));
-      fireEvent.click(screen.getByTestId("delete-btn"));
-    });
+const getCardRows = () => screen.getAllByTestId("competitor-card");
 
-    await waitFor(() => {
-      expect(screen.getByRole("dialog")).toBeDefined();
-      fireEvent.click(screen.getByRole("button", { name: /conferma/i }));
-    });
+const deleteAction = async (getElementsFn: () => Array<HTMLElement>) => {
+  await waitFor(() => {
+    fireEvent.click(within(getElementsFn()[0]).getByTestId("actions-btn"));
+    fireEvent.click(screen.getByTestId("delete-btn"));
+  });
 
-    await waitFor(() => {
-      expect(screen.queryByRole("dialog")).toBeNull();
-    });
-  };
+  await waitFor(() => {
+    expect(screen.getByRole("dialog")).toBeDefined();
+    fireEvent.click(screen.getByRole("button", { name: /conferma/i }));
+  });
 
+  await waitFor(() => {
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+};
+
+const testDeleteCompetitorAndReload = async (
+  ComponentToRender: React.ComponentType,
+  getElementsFn: () => Array<HTMLElement>,
+) => {
+  vi.mocked(fetch).mockResolvedValueOnce({
+    ok: true,
+    json: async () => competitorsResult,
+  } as Response);
+  vi.mocked(deleteCompetitor).mockResolvedValueOnce({});
+
+  renderWithAdapter(<ComponentToRender />);
+
+  await deleteAction(getElementsFn);
+
+  expect(deleteCompetitor).toHaveBeenCalledExactlyOnceWith(
+    expect.objectContaining({
+      id: competitorsResult.results[0].id,
+    }),
+  );
+  expect(fetch).toHaveBeenCalledTimes(2);
+};
+
+const testDeleteAndReloadFirstPage = async (
+  ComponentToRender: React.ComponentType,
+  getElementsFn: () => Array<HTMLElement>,
+) => {
+  vi.mocked(fetch).mockResolvedValueOnce({
+    ok: true,
+    json: async () => generateCompetitorsPage(1, totalValues, pageLimit),
+  } as Response);
+  vi.mocked(deleteCompetitor).mockResolvedValueOnce({});
+
+  renderWithAdapter(<ComponentToRender />);
+
+  await screen.findByTestId("pagination");
+
+  vi.mocked(fetch).mockResolvedValueOnce({
+    ok: true,
+    json: async () => generateCompetitorsPage(2, totalValues, pageLimit),
+  } as Response);
+
+  fireEvent.click(
+    within(screen.getByTestId("pagination")).getByRole("button", {
+      name: /2/,
+    }),
+  );
+
+  await waitFor(() => {
+    expect(getElementsFn()).toHaveLength(totalValues - pageLimit);
+  });
+
+  vi.mocked(fetch).mockResolvedValueOnce({
+    ok: true,
+    json: async () => generateCompetitorsPage(1, totalValues - 1, pageLimit),
+  } as Response);
+
+  await deleteAction(getElementsFn);
+
+  expect(fetch).toHaveBeenCalledWith(
+    `/api/competitors?page=1&limit=${pageLimit}&search=`,
+  );
+  expect(fetch).toHaveBeenCalledTimes(3);
+};
+
+describe("Competitors delete component on table page", () => {
   test("Should delete competitor successfully and reload", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => competitorsResult,
-    } as Response);
-    vi.mocked(deleteCompetitor).mockResolvedValueOnce({});
-
-    renderWithAdapter(<CompetitorsTable />);
-
-    await deleteAction();
-
-    expect(deleteCompetitor).toHaveBeenCalledExactlyOnceWith(
-      expect.objectContaining({
-        id: competitorsResult.results[0].id,
-      }),
-    );
-    expect(fetch).toHaveBeenCalledTimes(2);
+    await testDeleteCompetitorAndReload(CompetitorsTable, getBodyRows);
   });
 
   test("Should delete competitor second page row successfully and set previous page", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => generateCompetitorsPage(1, totalValues, pageLimit),
-    } as Response);
-    vi.mocked(deleteCompetitor).mockResolvedValueOnce({});
+    await testDeleteAndReloadFirstPage(CompetitorsTable, getBodyRows);
+  });
+});
 
-    renderWithAdapter(<CompetitorsTable />);
-
-    await screen.findByTestId("pagination");
-
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => generateCompetitorsPage(2, totalValues, pageLimit),
-    } as Response);
-
-    fireEvent.click(
-      within(screen.getByTestId("pagination")).getByRole("button", {
-        name: /2/,
-      }),
-    );
-
-    await waitFor(() => {
-      expect(getBodyRows()).toHaveLength(totalValues - pageLimit);
-    });
-
-    vi.mocked(fetch).mockResolvedValueOnce({
-      ok: true,
-      json: async () => generateCompetitorsPage(1, totalValues - 1, pageLimit),
-    } as Response);
-
-    await deleteAction();
-
-    expect(fetch).toHaveBeenCalledWith(
-      `/api/competitors?page=1&limit=${pageLimit}&search=`,
-    );
-    expect(fetch).toHaveBeenCalledTimes(3);
+describe("Competitors delete component on mobile list", () => {
+  test("Should delete competitor successfully and reload", async () => {
+    await testDeleteCompetitorAndReload(CompetitorsMobileList, getCardRows);
   });
 
+  test("Should delete competitor second page row successfully and set previous page", async () => {
+    await testDeleteAndReloadFirstPage(CompetitorsMobileList, getCardRows);
+  });
+});
+
+describe("Competitors delete component", () => {
   test("Should render toast with error on delete api", async () => {
     vi.mocked(deleteCompetitor).mockResolvedValueOnce(networkErrorResult);
 

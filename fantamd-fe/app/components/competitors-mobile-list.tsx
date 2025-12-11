@@ -34,7 +34,10 @@ export default function CompetitorsMobileList({ className }: any) {
 
   return (
     <>
-      <div className={`${className} flex-col h-full`}>
+      <div
+        className={`${className} flex-col h-full`}
+        data-testid="competitors-mobile-list"
+      >
         <div className="flex-grow overflow-y-auto p-4">
           <CompetitorsHeader
             applyFilterChange={(newValue) => {
@@ -49,7 +52,7 @@ export default function CompetitorsMobileList({ className }: any) {
           />
           {isValidating &&
             Array.from({ length: 5 }, (_, i) => (
-              <div key={i} className="mb-3">
+              <div key={i} className="mb-3" data-testid="competitor-skeleton">
                 <CompetitorCardSkeleton />
               </div>
             ))}
@@ -59,7 +62,10 @@ export default function CompetitorsMobileList({ className }: any) {
               {!filterValue && (
                 <div className="bg-foreground-100 py-2 px-4 rounded-lg flex text-foreground-600 text-tiny mb-5">
                   <div className="flex-grow">Totale partecipanti</div>
-                  <div className="flex-grow text-end font-bold">
+                  <div
+                    className="flex-grow text-end font-bold"
+                    data-testid="total-count"
+                  >
                     {totalCount}
                   </div>
                 </div>
