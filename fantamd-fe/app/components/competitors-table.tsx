@@ -164,7 +164,7 @@ export default function CompetitorsTable({ className }: any) {
               }}
               setModalCompetitor={setModalCompetitor}
             />
-            <Table isHeaderSticky data-testid="competitors-table">
+            <Table data-testid="competitors-table">
               <TableHeader columns={columns}>
                 {(column) => (
                   <TableColumn
@@ -182,7 +182,7 @@ export default function CompetitorsTable({ className }: any) {
                 loadingState={isValidating ? "loading" : "idle"}
               >
                 {(item: Competitor) => (
-                  <TableRow key={item?.id}>
+                  <TableRow key={item?.id} className="hover:bg-default-50">
                     {(columnKey) => (
                       <TableCell>{renderCell(item, columnKey)}</TableCell>
                     )}
